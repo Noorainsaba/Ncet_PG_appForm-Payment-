@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Flask Application{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/SignInUp.css') }}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-links">
+        <a href="{{ url_for('auth.home') }}">Home</a>
+        {% if 'user' in session %}
+            <span>Welcome, {{ session['user'] }}!</span>
+            <a href="{{ url_for('auth.signout') }}">Signout</a>
+        {% else %}
+            <a href="{{ url_for('auth.signin') }}">Signin</a>
+            <a href="{{ url_for('auth.signup') }}">Signup</a>
+        {% endif %}
+    </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer style="text-align: center;">
+        <p>&copy; 2024 Ncet PG Application</p>
+    </footer>
+</body>
+</html>

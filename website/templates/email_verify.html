@@ -1,0 +1,118 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+    <style>
+        #resend-btn{
+            display:none;
+        }
+        #timer{
+            color:red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Email Verification</h1>
+    <p>We have sent an OTP to {{ email }}. Please check your email and enter the OTP to verify your account.</p>
+    
+    <form action="{{ url_for('auth.verify_otp') }}" methods=["POST","GET"]>
+        <input type="hidden" name="email" value="{{ email }}">
+       
+        <label for="otp">Enter OTP:</label>
+        <input type="text" id="otp" name="otp" required>
+        <button type="submit">Verify</button>
+    </form>
+
+    <div id="resend-section">
+        <p id="resend-message">Resend OTP in <span id="timer"></span></p>
+        <button id="resend-btn" onclick="resendOtp()">Resend OTP</button>
+    </div>
+
+    <p id="resend-count-message">You have <span id="resend-count">{{ resend_count }}</span> OTP resend attempts left.</p>
+
+    <script>
+        let resendCount = parseInt("{{ resend_count | default(0) }}", 10);  // Ensure it is a number
+        let timerDuration = 60; // Time in seconds before allowing OTP resend
+        let timerElement = document.getElementById('timer');
+        let resendBtn = document.getElementById('resend-btn');
+        let resendMessage = document.getElementById('resend-message');
+        let resendCountMessage = document.getElementById('resend-count-message');
+        let interval;
+
+        function startTimer() {
+            let timeLeft = timerDuration;
+            resendBtn.style.display = 'none';
+            resendMessage.style.display = 'block';
+            timerElement.textContent = timeLeft + ' seconds';
+
+            interval = setInterval(function() {
+                timeLeft -= 1;
+                timerElement.textContent = timeLeft + ' seconds';
+
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    resendBtn.style.display = 'inline';
+                    resendMessage.style.display = 'none';
+                }
+            }, 1000);
+        }
+
+        function resendOtp() {
+            if (resendCount > 0) {
+                resendCount--;
+                // AJAX request to resend the OTP
+                fetch("{{ url_for('auth.resend_otp') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: "{{ email }}"
+                      
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        startTimer();  // Start the timer again
+                        resendCountMessage.innerHTML = `You have ${resendCount} OTP resend attempts left.`;
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            } else {
+                alert('You have exceeded the maximum number of OTP resend attempts.');
+            }
+        }
+
+        // Start the timer immediately when the page loads
+        startTimer();
+    </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+</head>
+<body>
+    <h1>Email Verification</h1>
+    <p>An OTP has been sent to {{ email }}. Please check your email and enter the OTP below to verify your email address.</p>
+    <p>OTP will expire in 5 mins</p>
+    <form action="{{ url_for('auth.verify_otp') }}" method="post">
+        <label for="otp">Enter OTP:</label>
+        <input type="text" id="otp" name="otp" required>
+        <button type="submit">Verify OTP</button>
+    </form>
+    <form action="{{ url_for('auth.resend_otp') }}" method="post">
+        <button type="submit">Resend OTP</button>
+    </form>
+</body>
+</html>

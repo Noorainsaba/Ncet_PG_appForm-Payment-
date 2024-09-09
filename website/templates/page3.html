@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page3</title>
+</head>
+<body>
+    <h3>Education Qualifications</h3>
+    <form action="{{url_for('app_form.eduQua_form')}}" method="POST">
+        <table border="1">
+            <!-- for visible border and thickness 1 pixel -->
+             <thead>
+            <tr>
+                <th>Level</th>
+                <th>Course</th>
+                <th>Board/University/Institution</th>
+                <th>College Name, City, State</th>
+                <th colspan="2">Year</th>
+                <th>Overall Percentage/Grade</th>
+            </tr>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th>From</th>
+                <th>To</th>
+                <th></th>
+            </tr>
+        </thead>
+            <tr>
+                <td>10<sup>th</sup> Standard</td>
+                <td><input type="text" name="course"></td>
+                <td><input type="text" name="board_university"></td>
+                <td><input type="text" name="college_name"></td>
+                <td><input type="text" name="year_from" size="4"></td>
+                <td><input type="text" name="year_to" size="4"></td>
+                <td><input type="text" name="grade"></td>
+            </tr>
+            <tr>
+                <td>12<sup>th</sup> Standard</td>
+                <td><input type="text" name="course"></td>
+                <td><input type="text" name="board_university"></td>
+                <td><input type="text" name="college_name"></td>
+                <td><input type="text" name="year_from" size="4"></td>
+                <td><input type="text" name="year_to" size="4"></td>
+                <td><input type="text" name="grade"></td>
+            </tr>
+            <tr>
+                <td>Graduation</td>
+                <td><input type="text" name="course"></td>
+                <td><input type="text" name="board_university"></td>
+                <td><input type="text" name="college_name"></td>
+                <td><input type="text" name="year_from" size="4"></td>
+                <td><input type="text" name="year_to" size="4"></td>
+                <td><input type="text" name="grade"></td>
+            </tr>
+            <tr>
+                <td>Post-Graduation</td>
+                <td><input type="text" name="course"></td>
+                <td><input type="text" name="board_university"></td>
+                <td><input type="text" name="college_name"></td>
+                <td><input type="text" name="year_from" size="4"></td>
+                <td><input type="text" name="year_to" size="4"></td>
+                <td><input type="text" name="grade"></td>
+            </tr>
+            <tr>
+                <td>Others</td>
+                <td><input type="text" name="course"></td>
+                <td><input type="text" name="board_university"></td>
+                <td><input type="text" name="college_name"></td>
+                <td><input type="text" name="year_from" size="4"></td>
+                <td><input type="text" name="year_to" size="4"></td>
+                <td><input type="text" name="grade"></td>
+            </tr>
+        </table>
+        <br>
+        <input type="submit" value="Submit">
+    </form>
+    <ul>
+        <li>If appearing for final year graduation examination, please mention the month and year of examination:</li>
+    </ul>
+</body>
+</html>

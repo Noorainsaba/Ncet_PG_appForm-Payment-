@@ -1,0 +1,18 @@
+from pymongo import MongoClient
+
+def get_db():
+    client=MongoClient("mongodb+srv://Ncet_ApplicationForm_Payments:Ncet_ApplicationForm(Payments)@cluster0.bok10.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+    db=client["Ncet_ApplicationForm(Payments)"] #db name
+    return db
+
+db=get_db()
+# collections
+eduQua_collection=db["education_qualifications"]#collection name
+users_collection=db["users"]#users name of collection
+temp_users_collection=db["temp_users"]
+
+counters_collection=db['counters']
+def initialize_app_number_counter():
+    if not counters_collection.find_one({"_id":"application_number"}):
+        counters_collection.insert_one({"_id":"application_number","sequence_value":0})
+initialize_app_number_counter()
