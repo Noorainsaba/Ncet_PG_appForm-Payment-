@@ -2,3 +2,4 @@ flask-mail
 flask
 pymongo
 Flask-WTF
+gunicorn
