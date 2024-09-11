@@ -13,14 +13,7 @@ auth=Blueprint('auth',__name__)
 @auth.route('/')
 def LandingPage():
     return render_template('LandingPage.html')
-# # configuartion send mail
-# auth.config["MAIL_SERVER"]='smtp.office365.com'
-# auth.config["MAIL_PORT"]='587'
-# auth.config["MAIL_USERNAME"]='ncet_aks@outlook.com'
-# auth.config['MAIL_PASSWORD']='aks@ncet'
-# auth.congig["MAIL_USE_TLS"]=True
-# auth.config["MAIL_USE_SSL"]=False
-# mail=Mail(auth)#Mail is class of flask-mail
+
 
 # route protection decorator
 def login_required(f):

@@ -3,83 +3,297 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page3</title>
+    <title>Application Form</title>
+    
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h3 {
+            color: #333;
+        }
+
+        form {
+            margin: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        input[type="text"], input[type="date"], textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            height: 100px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input[type="radio"], input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .specify-box {
+            width: auto;
+            display: inline;
+        }
+
+        /* Additional inline styles for form elements */
+        .inline-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .inline-options label {
+            margin-right: 15px;
+        }
+
+        .inline-options input {
+            margin-right: 5px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .inline-options .specify-box {
+            margin-top: 8px;
+        }
+    </style>
 </head>
 <body>
     <h3>Education Qualifications</h3>
     <form action="{{url_for('app_form.eduQua_form')}}" method="POST">
         <table border="1">
-            <!-- for visible border and thickness 1 pixel -->
-             <thead>
-            <tr>
-                <th>Level</th>
-                <th>Course</th>
-                <th>Board/University/Institution</th>
-                <th>College Name, City, State</th>
-                <th colspan="2">Year</th>
-                <th>Overall Percentage/Grade</th>
-            </tr>
-            <tr>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th>From</th>
-                <th>To</th>
-                <th></th>
-            </tr>
-        </thead>
-            <tr>
-                <td>10<sup>th</sup> Standard</td>
-                <td><input type="text" name="course"></td>
-                <td><input type="text" name="board_university"></td>
-                <td><input type="text" name="college_name"></td>
-                <td><input type="text" name="year_from" size="4"></td>
-                <td><input type="text" name="year_to" size="4"></td>
-                <td><input type="text" name="grade"></td>
-            </tr>
-            <tr>
-                <td>12<sup>th</sup> Standard</td>
-                <td><input type="text" name="course"></td>
-                <td><input type="text" name="board_university"></td>
-                <td><input type="text" name="college_name"></td>
-                <td><input type="text" name="year_from" size="4"></td>
-                <td><input type="text" name="year_to" size="4"></td>
-                <td><input type="text" name="grade"></td>
-            </tr>
-            <tr>
-                <td>Graduation</td>
-                <td><input type="text" name="course"></td>
-                <td><input type="text" name="board_university"></td>
-                <td><input type="text" name="college_name"></td>
-                <td><input type="text" name="year_from" size="4"></td>
-                <td><input type="text" name="year_to" size="4"></td>
-                <td><input type="text" name="grade"></td>
-            </tr>
-            <tr>
-                <td>Post-Graduation</td>
-                <td><input type="text" name="course"></td>
-                <td><input type="text" name="board_university"></td>
-                <td><input type="text" name="college_name"></td>
-                <td><input type="text" name="year_from" size="4"></td>
-                <td><input type="text" name="year_to" size="4"></td>
-                <td><input type="text" name="grade"></td>
-            </tr>
-            <tr>
-                <td>Others</td>
-                <td><input type="text" name="course"></td>
-                <td><input type="text" name="board_university"></td>
-                <td><input type="text" name="college_name"></td>
-                <td><input type="text" name="year_from" size="4"></td>
-                <td><input type="text" name="year_to" size="4"></td>
-                <td><input type="text" name="grade"></td>
-            </tr>
+            <thead>
+                <tr>
+                    <th>Level</th>
+                    <th>Course</th>
+                    <th>Board/University/Institution</th>
+                    <th>College Name, City, State</th>
+                    <th colspan="2">Year</th>
+                    <th>Overall Percentage/Grade</th>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>10<sup>th</sup> Standard</td>
+                    <td><input type="text" name="course"></td>
+                    <td><input type="text" name="board_university"></td>
+                    <td><input type="text" name="college_name"></td>
+                    <td><input type="text" name="year_from" size="4"></td>
+                    <td><input type="text" name="year_to" size="4"></td>
+                    <td><input type="text" name="grade"></td>
+                </tr>
+                <tr>
+                    <td>12<sup>th</sup> Standard</td>
+                    <td><input type="text" name="course"></td>
+                    <td><input type="text" name="board_university"></td>
+                    <td><input type="text" name="college_name"></td>
+                    <td><input type="text" name="year_from" size="4"></td>
+                    <td><input type="text" name="year_to" size="4"></td>
+                    <td><input type="text" name="grade"></td>
+                </tr>
+                <tr>
+                    <td>Graduation</td>
+                    <td><input type="text" name="course"></td>
+                    <td><input type="text" name="board_university"></td>
+                    <td><input type="text" name="college_name"></td>
+                    <td><input type="text" name="year_from" size="4"></td>
+                    <td><input type="text" name="year_to" size="4"></td>
+                    <td><input type="text" name="grade"></td>
+                </tr>
+                <tr>
+                    <td>Post-Graduation</td>
+                    <td><input type="text" name="course"></td>
+                    <td><input type="text" name="board_university"></td>
+                    <td><input type="text" name="college_name"></td>
+                    <td><input type="text" name="year_from" size="4"></td>
+                    <td><input type="text" name="year_to" size="4"></td>
+                    <td><input type="text" name="grade"></td>
+                </tr>
+                <tr>
+                    <td>Others</td>
+                    <td><input type="text" name="course"></td>
+                    <td><input type="text" name="board_university"></td>
+                    <td><input type="text" name="college_name"></td>
+                    <td><input type="text" name="year_from" size="4"></td>
+                    <td><input type="text" name="year_to" size="4"></td>
+                    <td><input type="text" name="grade"></td>
+                </tr>
+            </tbody>
         </table>
+        <br>
+        
+        <!-- New Fields -->
+        <div class="section">
+            <h3>Work Experience</h3>
+            <div class="inline-options">
+                <label for="work_experience_yes">
+                    <input type="radio" id="work_experience_yes" name="work_experience" value="Yes">
+                    Yes
+                </label>
+                <label for="work_experience_no">
+                    <input type="radio" id="work_experience_no" name="work_experience" value="No">
+                    No
+                </label>
+            </div>
+            <div id="work_experience_details" style="display:none;">
+                <label for="total_years">Total years of work experience:</label>
+                <input type="text" id="total_years" name="total_years">
+                <br>
+                <label for="work_from">From:</label>
+                <input type="text" id="work_from" name="work_from">
+                <label for="work_to">To:</label>
+                <input type="text" id="work_to" name="work_to">
+                <br>
+                <label for="organization">Organization's Name:</label>
+                <input type="text" id="organization" name="organization">
+                <br>
+                <label for="awards">Awards and Honors received:</label>
+                <textarea id="awards" name="awards"></textarea>
+                <br>
+                <label for="interests">Interests and Hobbies:</label>
+                <textarea id="interests" name="interests"></textarea>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Finance Details</h3>
+            <label for="family_income">Family's consolidated annual income (p.a.):</label>
+            <select id="family_income" name="family_income">
+                <option value="<1,00,000">Less than 1,00,000</option>
+                <option value="1,00,000-3,00,000">1,00,000 - 3,00,000</option>
+                <option value="3,00,000-7,00,000">3,00,000 - 7,00,000</option>
+                <option value="7,00,000-10,00,000">7,00,000 - 10,00,000</option>
+                <option value=">10,00,000">More than 10,00,000</option>
+            </select>
+            <br>
+            <label for="finance_source">How would you finance studies at Nagarjuna Degree College?</label>
+            <div class="inline-options">
+                <label for="finance_family">
+                    <input type="checkbox" id="finance_family" name="finance_source" value="Family">
+                    Family
+                </label>
+                <label for="finance_employer">
+                    <input type="checkbox" id="finance_employer" name="finance_source" value="Employer">
+                    Employer
+                </label>
+                <label for="finance_loan">
+                    <input type="checkbox" id="finance_loan" name="finance_source" value="Loan">
+                    Loan
+                </label>
+                <label for="finance_other">
+                    <input type="checkbox" id="finance_other" name="finance_source" value="Other">
+                    Other
+                </label>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Entrance Test Details</h3>
+            <label for="test_name">Please fill in the details if you have appeared for any of the following:</label>
+            <div class="inline-options">
+                <label for="pgcet">
+                    <input type="checkbox" id="pgcet" name="entrance_test" value="PGCET">
+                    PGCET
+                </label>
+                <label for="mat">
+                    <input type="checkbox" id="mat" name="entrance_test" value="MAT">
+                    MAT
+                </label>
+                <label for="cat">
+                    <input type="checkbox" id="cat" name="entrance_test" value="CAT">
+                    CAT
+                </label>
+                <label for="xat">
+                    <input type="checkbox" id="xat" name="entrance_test" value="XAT">
+                    XAT
+                </label>
+                <label for="gmat">
+                    <input type="checkbox" id="gmat" name="entrance_test" value="GMAT">
+                    GMAT
+                </label>
+                <label for="cmat">
+                    <input type="checkbox" id="cmat" name="entrance_test" value="CMAT">
+                    CMAT
+                </label>
+                <label for="other_tests">
+                    <input type="checkbox" id="other_tests" name="entrance_test" value="Other">
+                    Other (Please Specify)
+                </label>
+                <input type="text" id="other_tests_specify" name="other_tests_specify" class="specify-box">
+            </div>
+            <br>
+            <label for="test_score">Your Score Percentage/Percentile:</label>
+            <input type="text" id="test_score" name="test_score">
+            <br>
+            <label for="registration_no">Registration No:</label>
+            <input type="text" id="registration_no" name="registration_no">
+            <br>
+            <label for="exam_date">Date of Examination Taken:</label>
+            <input type="date" id="exam_date" name="exam_date">
+            <br>
+            <label for="no_exams">I have not appeared for any of the above mentioned examinations:</label>
+            <input type="checkbox" id="no_exams" name="no_exams">
+        </div>
+
         <br>
         <input type="submit" value="Submit">
     </form>
-    <ul>
-        <li>If appearing for final year graduation examination, please mention the month and year of examination:</li>
-    </ul>
+
+    <script>
+        document.querySelectorAll('input[name="work_experience"]').forEach(function(el) {
+            el.addEventListener('change', function() {
+                document.getElementById('work_experience_details').style.display = this.value === 'Yes' ? 'block' : 'none';
+            });
+        });
+    </script>
 </body>
 </html>
