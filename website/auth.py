@@ -232,7 +232,12 @@ def verify_otp():
             temp_users_collection.delete_one({'email':email})
 
             flash('Email verified successfully and Application number is generated!Please sign in',category='success')
-            
+            try:
+                msg = Message('Application Number | NCET-PG Admissions Gateway', sender='ncet_aks1@outlook.com', recipients=[email])
+                msg.body = f"Your Application number for NCET-PG Admissions Gateway is {app_number}."
+                mail.send(msg)
+            except Exception as e:
+                flash(f'error sending mail! {e}') 
             
             return render_template('app_num_popup.html', app_number=app_number)
         else:
@@ -329,6 +334,144 @@ def signup():
     #         return redirect(url_for('auth.signup'))
     
     return render_template('signup.html')
+
+@auth.route('/reset_password',methods=['GET','POST'])
+def reset_password():
+    if request.method=='POST':
+        new_password=request.form.get('new_password')
+        confirm_password=request.form.get('confirm_password')
+        email=session.get('email')
+
+        user=users_collection.find_one({"email":email})
+        current_hashed_password=user['password']
+
+        if check_password_hash(current_hashed_password, new_password):
+            flash('New password cannot be the same as the current password. Please choose a different password.', category='error')
+            return redirect(url_for('auth.reset_password'))
+        
+        if new_password != confirm_password:
+            flash('Passwords do not match. Please try again.', category='error')
+            return redirect(url_for('auth.reset_password'))
+
+        hashed_password=generate_password_hash(new_password)
+
+        users_collection.update_one({"email":email},{"$set":{"password":hashed_password}})
+
+        session.pop('email',None)
+
+        flash('Your password has been successfully updated. Please log in with your new password.', category='success')
+        return redirect(url_for('auth.signin'))
+    return render_template('reset_password.html')
+
+@auth.route('/verify_password_reset_otp',methods=['GET','POST'])
+def verify_password_reset_otp():
+    if request.method=='POST':
+        entered_otp=request.form.get('otp')
+        email=session.get('email')
+        saved_otp=session.get('otp')
+        otp_timestamp=session.get('otp_timestamp')
+    
+        current_time = time.time()
+        if otp_timestamp and (current_time - otp_timestamp) > 300:
+            flash('OTP has expired. Please request a new one.', category='error')
+            return redirect(url_for('auth.forgot_password'))
+        
+        if int(entered_otp)==saved_otp:
+            session.pop('otp', None)
+            session.pop('otp_timestamp', None)
+            flash('OTP verified. Please set a new password.', category='success')
+            return redirect(url_for('auth.reset_password'))
+        else:
+            flash('Invalid OTP. Please try again.', category='error')
+    return render_template('verify_password_reset_otp.html')
+
+@auth.route('/forgot_password',methods=['GET','POST'])
+def forgot_password():
+    if request.method=='POST':
+        email=request.form.get('email')
+        user=users_collection.find_one({'email':email})
+
+        if user:
+            otp = random.randint(100000, 999999)
+            session['otp'] = otp
+            session['email'] = email
+            session['otp_timestamp'] = time.time()
+
+            try:
+                msg = Message('Password Reset OTP', sender='ncet_aks1@outlook.com', recipients=[email])
+                msg.body = f"Your OTP for password reset is {otp}."
+                mail.send(msg)
+                flash('OTP has been sent to your email. Please check your inbox.', category='info')
+                return redirect(url_for('auth.verify_password_reset_otp'))
+            except Exception as e:
+                flash(f'error sending mail! {e}') 
+        else:
+            flash('This email is not registered.', category='error')
+    return render_template('forgot_password.html')
+
+
+@auth.route('/verify_application_number_otp',methods=['GET','POST'])
+def verify_application_number_otp():
+    if request.method=='POST':
+        entered_otp=request.form.get('otp')
+        email=session.get('email')
+        saved_otp=session.get('otp')
+        otp_timestamp=session.get('otp_timestamp')
+
+        current_time=time.time()
+        if otp_timestamp and (current_time-otp_timestamp)>300:
+            flash('OTP has expired.Please request a new one.',category='error')
+            return redirect(url_for('auth.forgot_application_number'))
+        
+        if int(entered_otp)==saved_otp:
+            user =users_collection.find_one({"email":email})
+            if user:
+                application_number=user.get('application_number')
+
+                session.pop('otp',None)
+                session.pop('otp_timestamp',None)
+
+                try:
+                    msg=Message('Your Application Number', sender='ncet_aks1@outlook.com',recipients=[email])
+                    msg.body = f"Hi,\nYour application number is: {application_number}."
+                    mail.send(msg)
+                    flash('Your application number has been sent to your email.', category='success')
+                    return redirect(url_for('auth.signin'))
+                except Exception as e:
+                    flash(f'Error sending mail! {e}')
+                    return redirect(url_for('auth.forgot_application_number'))
+            else:
+                flash('User not found.',category='error')
+                return redirect(url_for('auth.forgot_application_number'))
+        else:
+            flash('Invalid OTP. Please try again.', category='error')
+    return render_template('verify_application_number_otp.html')
+
+@auth.route('/forgot_application_number',methods=['GET','POST'])
+def forgot_application_number():
+    if request.method=='POST':
+        email=request.form.get('email')
+
+        user =users_collection.find_one({"email":email})
+        if user:
+            otp=random.randint(100000,999999)
+            session['otp']=otp
+            session['email']=email
+            session['otp_timestamp']=time.time()
+
+            try:
+                msg=Message('Application Number Retrieval OTP',sender='ncet_aks1@outlook.com',recipients=[email])
+                msg.body=f"Your OTP for retrieving the application number is {otp}."
+                mail.send(msg)
+                flash('OTP sent to your email.Please check your inbox.',category='info')
+                return redirect(url_for('auth.verify_application_number_otp'))
+            except Exception as e:
+                flash(f"Error sending mail! {e}")
+                return redirect(url_for('auth.forgot_application_number'))
+        else:
+            flash('This email is not registered.',category='error')
+    return render_template('forgot_application_number.html')
+            
 
 @auth.route('/signin',methods=['GET','POST'])
 def signin():
