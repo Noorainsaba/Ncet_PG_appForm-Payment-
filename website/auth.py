@@ -122,7 +122,7 @@ def confirm_resend_otp():
         session['otp_timestamp'] = current_time
         session['otp_resend_count'] = otp_resend_count + 1
 
-        msg = Message('Ncet PG Application form email verification', sender='ncet_aks@outlook.com', recipients=[email])
+        msg = Message('Ncet PG Application form email verification', sender='ncet_aks1@outlook.com', recipients=[email])
         msg.body = f"Hi,\nYour new email OTP is: {otp}"
 
         try:
@@ -278,7 +278,7 @@ def signup():
         # Message->class
 
         # subject
-        msg=Message('Ncet PG Application form email verification',sender='ncet_aks@outlook.com',recipients=[email])
+        msg=Message('Ncet PG Application form email verification',sender='ncet_aks1@outlook.com',recipients=[email])
 
         # msg body,otp must b string so that it can b written in the body
         msg.body="Hi"+name+"\nYour email OTP is:" +str(otp)
