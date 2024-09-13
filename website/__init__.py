@@ -12,11 +12,11 @@ def create_app():
     # configuartion send mail
     app.config["MAIL_SERVER"]='smtp.office365.com'
     app.config["MAIL_PORT"]=587
-    app.config["MAIL_USERNAME"]='ncet_aks@outlook.com'
-    app.config['MAIL_PASSWORD']='aks@ncet'
+    app.config["MAIL_USERNAME"]='ncet_aks1@outlook.com'
+    app.config['MAIL_PASSWORD']='aks1@ncet'
     app.config["MAIL_USE_TLS"]=True #enables transport layer security for secure email communication
     app.config["MAIL_USE_SSL"]=False
-    app.config['MAIL_DEFAULT_SENDER']='ncet_aks@outlook.com'
+    app.config['MAIL_DEFAULT_SENDER']='ncet_aks1@outlook.com'
     # mail=Mail(auth)#Mail is class of flask-mail
     mail.init_app(app)#initializes email configuration
 
