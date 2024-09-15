@@ -7,10 +7,11 @@ def get_db():
 
 db=get_db()
 # collections
-eduQua_collection=db["education_qualifications"]#collection name
 users_collection=db["users"]#users name of collection
 temp_users_collection=db["temp_users"]
+page1_collection=db["page1_collection"]
 page2_collection = db["page2_collection"] 
+page3_collection=db["page3_collection"]
 
 counters_collection=db['counters']
 def initialize_app_number_counter():
