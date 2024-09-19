@@ -12,6 +12,7 @@ from bson import ObjectId
 
 app_form=Blueprint('app_form',__name__)
 
+
 @app_form.route('/page1', methods=['POST','GET'])
 def page1():
     if request.method=='POST':
@@ -34,11 +35,18 @@ def page1():
         except ConnectionError as e:
             flash(f"Error connecting to MongoDB: {e}")
 
+    #     return redirect(url_for('app_form.page2'))
+    # return render_template("page1.html")
+        session['completed_steps'] = [1]  # Mark section 1 as completed
         return redirect(url_for('app_form.page2'))
-    return render_template("page1.html")
+
+    return render_template('page1.html')
+
 
 @app_form.route('/page2', methods=['POST','GET'])
 def page2():
+    if 1 not in session.get('completed_steps', []):
+        return redirect(url_for('app_form.page2'))
     if request.method=='POST':
         form_data = {
             "application_number":session.get("application_number"),
@@ -87,8 +95,12 @@ def page2():
 
         page2_collection.insert_one(form_data)
 
+    #     return redirect(url_for('app_form.page3'))
+    # return render_template("page2.html")
+        session['completed_steps'].append(2)  # Mark section 2 as completed
         return redirect(url_for('app_form.page3'))
-    return render_template("page2.html")
+
+    return render_template('page2.html')
 
 
 @app_form.route('/page3',methods=['POST','GET'])
@@ -283,7 +295,31 @@ def preview():
     return render_template('preview.html', application_number=application_number)
 
 
+# @app_form.route('/section1', methods=['GET', 'POST'])
+# def section1():
+#     if request.method == 'POST':
+#         # Process the form data for Section 1
+#         # ...
 
+#         # Update completion status
+#         session['completed_steps'] = [1]  # Mark section 1 as completed
+#         return redirect(url_for('auth.home'))
 
+#     return render_template('section1.html')
 
+# @app_form.route('/section2', methods=['GET', 'POST'])
+# def section2():
+#     # Ensure Section 1 is completed before proceeding
+#     if 1 not in session.get('completed_steps', []):
+#         return redirect(url_for('home'))
+
+#     if request.method == 'POST':
+#         # Process the form data for Section 2
+#         # ...
+
+#         # Update completion status
+#         session['completed_steps'].append(2)  # Mark section 2 as completed
+#         return redirect(url_for('auth.home'))
+
+#     return render_template('section2.html')
 

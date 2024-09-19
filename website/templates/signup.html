@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 
 {% block title %}Signup{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/signup.css') }}">
+{% endblock %}
 
 {% block content %}
     <h2>Create an Account</h2>
@@ -19,45 +22,8 @@
             <label for="password">Password</label>
             <input type="password" id="password" name="password" class="input-field" required>
         </div>
-        <h1 style="font-size: medium;">Note:Upon creating your account, you will receive an application number, which you can use to sign in.</h1>
+        <h1>Note:Upon creating your account, you will receive an application number, which you can use to sign in.</h1>
         <br/>
         <button type="submit" class="btn">Signup</button>
-    </form>
-    <!-- Modal HTML -->
-    <!-- <div class="modal fade" id="applicationNumberModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalLabel">Application Number</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div> -->
-                <!-- <div class="modal-body">
-                    Your application number is: <input type="text" class="form-control" value="{{ session.get('application_number') }}" readonly>
-                </div>
-                <div class="modal-footer">
-                    <a href="{{ url_for('auth.signin') }}" class="btn btn-primary">Sign In</a>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div> -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Script references -->
-    <!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-     -->
-    <!-- Show modal if application number should be shown -->
-    <!-- {% if show_modal %}
-        <div id="successModal"></div>
-            <p>Account created successfully! Check your email for verification.</p>
-        </div>
-        <script>
-            $(document).ready(function() {
-                $('#applicationNumberModal').modal('show');
-            });
-        </script>
-    {% endif %} -->
+    
 {% endblock %}

@@ -43,7 +43,7 @@
         }
 
         .btn-signin {
-            background-color: #007bff;
+            background-color: #28a745;
         }
     </style>
 </head>
@@ -56,13 +56,14 @@
             <p>Application number is also shared through email.</p>
             <!-- Use a JavaScript variable for the URL -->
             <button class="btn btn-signin" onclick="redirectToSignin()">Sign In</button>
-            <!-- <button class="btn btn-ok" onclick="closePopup()">OK</button> -->
+            <button class="btn btn-ok" onclick="closePopup()">Close</button>
         </div>
     </div>
 
     <script>
         // Assign the Flask route to a JavaScript variable
         var signinUrl = "{{ url_for('auth.signin') }}";
+        var signupUrl = "{{ url_for('auth.signup') }}";
 
         // Function to redirect to the Sign In page
         function redirectToSignin() {
@@ -71,6 +72,10 @@
 
         function openPopup() {
             document.getElementById('popup-overlay').style.display = 'block';
+        }
+
+        function closePopup() {
+            window.location.href = signupUrl;
         }
 
         

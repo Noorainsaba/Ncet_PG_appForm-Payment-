@@ -515,6 +515,10 @@ def home():
     
     user_name=session.get('user')
     application_number=session.get('application_number')
+    if 'completed_steps' not in session:
+        session['completed_steps'] = [1]  # Assume only section 1 is completed
 
-    return render_template('home.html',user_name=user_name,application_number=application_number)
+    # Pass the completion status to the template
+    # return render_template('home.html', completed_steps=session['completed_steps'])
+    return render_template('home.html',user_name=user_name,application_number=application_number,completed_steps=session['completed_steps'])
 

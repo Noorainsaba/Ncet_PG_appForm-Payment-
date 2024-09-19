@@ -1,0 +1,84 @@
+/* Container for the form */
+form {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Form title */
+h2 {
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    color: #444;
+    text-align: center;
+}
+
+/* Form group */
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* Input fields */
+.input-field {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+.input-field:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Button styling */
+.btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+/* Links */
+a {
+    color: #007bff;
+    text-decoration: none;
+    font-size: 0.9em;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    form {
+        padding: 20px;
+    }
+
+    h2 {
+        font-size: 1.5em;
+    }
+}

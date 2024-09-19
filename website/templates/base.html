@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Flask Application{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/SignInUp.css') }}">
-    {% block styles %}{% endblock %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar">
         <div class="navbar-links">
-        <a href="{{ url_for('auth.home') }}">Home</a>
         {% if 'user' in session %}
+            <a href="{{ url_for('auth.home') }}">Home</a>
             <span>Welcome, {{ session['user'] }}!</span>
             <a href="{{ url_for('auth.signout') }}">Signout</a>
         {% else %}
