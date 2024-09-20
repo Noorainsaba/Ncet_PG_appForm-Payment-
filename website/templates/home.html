@@ -1,45 +1,19 @@
 {% extends 'base.html' %}
 
 {% block title %}Dashboard{% endblock %}
-{% block extra_css%}
-<style>
-    /* Style for the progress tracker container */
-.progress-tracker {
-    display: flex;              /* Align items horizontally */
-    justify-content: space-between;  /* Evenly space out sections */
-    margin: 20px 0;             /* Add some margin for spacing */
-}
 
-/* Style for individual steps */
-.step {
-    flex: 1;                    /* Allow each step to grow equally */
-    text-align: center;         /* Center text within each step */
-    padding: 10px;              /* Add padding for better appearance */
-    background-color: #ddd;     /* Light grey background for steps */
-    margin: 0 5px;              /* Add a small margin between steps */
-    border-radius: 5px;         /* Rounded corners for a smooth look */
-}
-
-/* Style for completed steps */
-.step.completed {
-    background-color: #4caf50;  /* Green background to indicate completion */
-    color: white;               /* White text for contrast */
-}
-
-</style>
-{% endblock%}
 {% block content %}
-<div class="progress-tracker">
+<!-- <div class="progress-tracker">
     <div class="step" id="step1">page1</div>
     <div class="step" id="step2">page2</div>
-    <div class="step" id="step3">page3</div>
+    <div class="step" id="step3">page3</div> -->
     <!-- Add more sections as needed -->
-</div>
+<!-- </div>
 <script>
     const completedSteps = JSON.parse('{{ completed_steps | tojson | safe }}' || '[]');
     console.log(completedSteps);
 </script>
-<script src="{{ url_for('static', filename='js/progress_tracker.js') }}"></script>
+<script src="{{ url_for('static', filename='js/progress_tracker.js') }}"></script> -->
 
     <h2>Welcome to your Dashboard, {{ user_name }}!</h2>
     <p>Your Application Number: {{ application_number }}</p>

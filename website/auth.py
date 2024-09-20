@@ -478,7 +478,7 @@ def signin():
     if request.method=='POST':
         app_number=request.form.get('application_number')
         password=request.form.get('password')
-
+        session['signin']=True
         user=users_collection.find_one({"application_number":app_number})
 
         if user:
@@ -515,10 +515,13 @@ def home():
     
     user_name=session.get('user')
     application_number=session.get('application_number')
-    if 'completed_steps' not in session:
-        session['completed_steps'] = [1]  # Assume only section 1 is completed
+    
+    if 'progress' not in session:
+        session['progress'] = {'page1':False,'page2':False,'page3':False}
+    return redirect(url_for('app_form.page1'))
 
     # Pass the completion status to the template
     # return render_template('home.html', completed_steps=session['completed_steps'])
-    return render_template('home.html',user_name=user_name,application_number=application_number,completed_steps=session['completed_steps'])
+
+    # return render_template('home.html',user_name=user_name,application_number=application_number)
 

@@ -1,105 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Application Form</title>
-    
-    <style>
-
-        body {
-            font-family: Arial, sans-serif;
-        }
-
-        h3 {
-            color: #333;
-        }
-
-        form {
-            margin: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        table, th, td {
-            border: 1px solid black;
-        }
-
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-
-        input[type="text"], input[type="date"], textarea {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-        }
-
-        textarea {
-            height: 100px;
-        }
-
-        label {
-            display: block;
-            margin: 10px 0 5px;
-        }
-
-        input[type="radio"], input[type="checkbox"] {
-            margin-right: 5px;
-        }
-
-        input[type="submit"] {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 10px 0;
-            cursor: pointer;
-        }
-
-        input[type="submit"]:hover {
-            background-color: #45a049;
-        }
-
-        .specify-box {
-            width: auto;
-            display: inline;
-        }
-
-        /* Additional inline styles for form elements */
-        .inline-options {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .inline-options label {
-            margin-right: 15px;
-        }
-
-        .inline-options input {
-            margin-right: 5px;
-        }
-
-        .section {
-            margin-bottom: 20px;
-        }
-
-        .inline-options .specify-box {
-            margin-top: 8px;
-        }
-    </style>
-</head>
-<body>
-    <h3>Education Qualifications</h3>
+{% extends 'base.html' %}
+{% block title %}page3{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{url_for('static',filename="css/page3.css")}}">
+{% endblock %}
+{% block content %}
+<h3>Education Qualifications</h3>
     <form action="{{url_for('app_form.page3')}}" method="POST">
         <table border="1">
             <thead>
@@ -285,7 +190,7 @@
         </div>
 
         <br>
-        <input type="submit" value="Submit">
+        <input type="submit" value="Save and Proceed">
     </form>
 
     <script>
@@ -295,5 +200,8 @@
             });
         });
     </script>
-</body>
-</html>
+{% endblock %}
+
+
+
+

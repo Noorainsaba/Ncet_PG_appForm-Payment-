@@ -15,6 +15,8 @@ app_form=Blueprint('app_form',__name__)
 
 @app_form.route('/page1', methods=['POST','GET'])
 def page1():
+    if 'signin' not in session or not session['signin']:
+        return redirect(url_for('auth.signin'))
     if request.method=='POST':
         name = request.form['name']
         email = request.form['email']
@@ -35,18 +37,18 @@ def page1():
         except ConnectionError as e:
             flash(f"Error connecting to MongoDB: {e}")
 
-    #     return redirect(url_for('app_form.page2'))
-    # return render_template("page1.html")
-        session['completed_steps'] = [1]  # Mark section 1 as completed
+        session['progress']['page1']=True
+        session.modified = True
         return redirect(url_for('app_form.page2'))
-
     return render_template('page1.html')
 
 
 @app_form.route('/page2', methods=['POST','GET'])
 def page2():
-    if 1 not in session.get('completed_steps', []):
-        return redirect(url_for('app_form.page2'))
+    if 'signin' not in session or not session['signin']:
+        return redirect(url_for('auth.signin'))
+    if not session['progress']['page1']:
+        return redirect(url_for('app_form.page1'))
     if request.method=='POST':
         form_data = {
             "application_number":session.get("application_number"),
@@ -94,10 +96,8 @@ def page2():
         }
 
         page2_collection.insert_one(form_data)
-
-    #     return redirect(url_for('app_form.page3'))
-    # return render_template("page2.html")
-        session['completed_steps'].append(2)  # Mark section 2 as completed
+        session['progress']['page2']=True
+        session.modified = True
         return redirect(url_for('app_form.page3'))
 
     return render_template('page2.html')
@@ -105,6 +105,10 @@ def page2():
 
 @app_form.route('/page3',methods=['POST','GET'])
 def page3():
+    if 'signin' not in session or not session['signin']:
+        return redirect(url_for('auth.signin'))
+    if not session['progress']['page2']:
+        return redirect(url_for('app_form.page2'))
     if request.method=='POST':
         education_data ={
             "10th_standard":{
@@ -183,12 +187,17 @@ def page3():
 
         # Insert data into MongoDB collection
         page3_collection.insert_one(form_data)
-
+        session['progress']['page3']=True
+        session.modified = True
         return redirect(url_for('app_form.page4'))
     return render_template("page3.html")
 
 @app_form.route('/page4',methods=['GET'])
 def page4():
+    if not session['progress']['page3']:
+        return redirect(url_for('app_form.page2'))
+    if 'signin' not in session or not session['signin']:
+        return redirect(url_for('auth.signin'))
     return render_template("page4.html")
 
 # def generate_pdf(data):

@@ -22,12 +22,23 @@
     </div>
     </nav>
 
+    {% if 'user' in session and session.get('signin') %}
+        <div class="progress-tracker">
+            <div class="page {% if session.get('progress') and session['progress']['page1'] %}completed{% elif request.path=='/page1' %}active{% endif %}" onclick="window.location.href='/page1' ">Page 1</div>
+            <div class="page {% if session.get('progress') and session['progress']['page2'] %}completed{% elif request.path=='/page2' %}active{% endif %}" onclick="window.location.href='/page2' ">Page 2</div>
+            <div class="page {% if session.get('progress') and session['progress']['page3'] %}completed{% elif request.path=='/page3' %}active{% endif %}" onclick="window.location.href='/page3' ">Page 3</div>
+            <div class="page {% if session.get('progress') and session['progress']['page4'] %}completed{% elif request.path=='/page4' %}active{% endif %}" onclick="window.location.href='/page4' ">Page 4</div>
+        </div>
+    {% endif %}
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <ul class="flashes">
                 {% for category, message in messages %}
-                    <li class="{{ category }}">{{ message }}</li>
+                    <li class="{{ category }}">
+                        {{ message }}
+                        <button class="close-btn" onclick="this.parentElement.style.display='none';">x</button>
+                    </li>
                 {% endfor %}
             </ul>
         {% endif %}
