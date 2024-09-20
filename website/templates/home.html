@@ -3,18 +3,6 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<!-- <div class="progress-tracker">
-    <div class="step" id="step1">page1</div>
-    <div class="step" id="step2">page2</div>
-    <div class="step" id="step3">page3</div> -->
-    <!-- Add more sections as needed -->
-<!-- </div>
-<script>
-    const completedSteps = JSON.parse('{{ completed_steps | tojson | safe }}' || '[]');
-    console.log(completedSteps);
-</script>
-<script src="{{ url_for('static', filename='js/progress_tracker.js') }}"></script> -->
-
     <h2>Welcome to your Dashboard, {{ user_name }}!</h2>
     <p>Your Application Number: {{ application_number }}</p>
     <a href="{{ url_for('auth.home') }}">Go to Home</a>

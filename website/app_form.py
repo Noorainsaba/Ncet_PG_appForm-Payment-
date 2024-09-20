@@ -23,24 +23,35 @@ def page1():
         age = request.form.get('age', type=int)
         message = request.form['message']
 
-        contact_data = {
-            "application_number":session.get("application_number"),
-            'name': name,
-            'email': email,
-            'age': age,
-            'message': message
+        # temporarily storing data,even after user clicks back option from the popup
+        session['page1_data']={
+            'name':name,
+            'email':email,
+            'age':age,
+            'message':message
         }
 
-        # Insert data into MongoDB
-        try:
-            page1_collection.insert_one(contact_data)
-        except ConnectionError as e:
-            flash(f"Error connecting to MongoDB: {e}")
+        if 'save' in request.form:
+            contact_data = {
+                "application_number":session.get("application_number"),
+                'name': name,
+                'email': email,
+                'age': age,
+                'message': message
+            }
 
-        session['progress']['page1']=True
-        session.modified = True
+            # Insert data into MongoDB
+            try:
+                page1_collection.insert_one(contact_data)
+                session['progress']['page1']=True
+                session.modified = True
+            except ConnectionError as e:
+                flash(f"Error connecting to MongoDB: {e}")
+                return redirect(url_for('app_form.page1'))
         return redirect(url_for('app_form.page2'))
-    return render_template('page1.html')
+    
+    page1_data=session.get('page1_data',{})
+    return render_template('page1.html',page1_data=page1_data)
 
 
 @app_form.route('/page2', methods=['POST','GET'])
@@ -50,57 +61,152 @@ def page2():
     if not session['progress']['page1']:
         return redirect(url_for('app_form.page1'))
     if request.method=='POST':
-        form_data = {
-            "application_number":session.get("application_number"),
-            "admission_type": request.form.get("admission_type"),
-            "pgcet_no": request.form.get("pgcet_no"),
-            "admission_order_no": request.form.get("admission_order_no"),
-            "rank": request.form.get("rank"),
-            "claimed_category": request.form.get("claimed_category"),
-            "allocated_category": request.form.get("allocated_category"),
-            "locality": request.form.get("admission_type"),
-            "first_name": request.form.get("first_name"),
-            "middle_name": request.form.get("middle_name"),
-            "surname": request.form.get("surname"),
-            "dob": request.form.get("dob"),
-            "gender": request.form.get("gender"),
-            "nationality": request.form.get("nationality"),
-            "religion": request.form.get("religion"),
-            "blood_group": request.form.get("blood_group"),
-            "physically_challenged": request.form.get("physically_challenged"),
-            "category": request.form.get("category"),
-            "aadhaar_no": request.form.get("aadhaar_no"),
-            "father_name": request.form.get("father_name"),
-            "mother_name": request.form.get("mother_name"),
-            "father_occupation": request.form.get("father_occupation"),
-            "mother_occupation": request.form.get("mother_occupation"),
-            "father_phone": request.form.get("father_phone"),
-            "mother_phone": request.form.get("mother_phone"),
-            "correspondence_city": request.form.get("correspondence_city"),
-            "correspondence_pincode": request.form.get("correspondence_pincode"),
-            "correspondence_state": request.form.get("correspondence_state"),
-            "correspondence_country": request.form.get("correspondence_country"),
-            "correspondence_tel": request.form.get("correspondence_tel"),
-            "correspondence_mobile": request.form.get("correspondence_mobile"),
-            "permanent_city": request.form.get("permanent_city"),
-            "permanent_pincode": request.form.get("permanent_pincode"),
-            "permanent_state": request.form.get("permanent_state"),
-            "permanent_country": request.form.get("permanent_country"),
-            "permanent_tel": request.form.get("permanent_tel"),
-            "permanent_mobile": request.form.get("permanent_mobile"),
-            "preferred_contact_time": request.form.get("preferred_contact_time"),
-            "passport": request.form.get("passport"),
-            "passport_no": request.form.get("passport_no"),
-            "passport_expiry": request.form.get("passport_expiry"),
-            "passport_issued_on": request.form.get("passport_issued_on"),
+        application_number=session.get("application_number"),
+        admission_type=request.form.get("admission_type"),
+        pgcet_no=request.form.get("pgcet_no"),
+        admission_order_no=request.form.get("admission_order_no"),
+        rank=request.form.get("rank"),
+        claimed_category=request.form.get("claimed_category"),
+        allocated_category=request.form.get("allocated_category"),
+        locality=request.form.get("admission_type"),
+        first_name=request.form.get("first_name"),
+        middle_name=request.form.get("middle_name"),
+        surname=request.form.get("surname"),
+        dob=request.form.get("dob"),
+        gender=request.form.get("gender"),
+        nationality=request.form.get("nationality"),
+        religion=request.form.get("religion"),
+        blood_group=request.form.get("blood_group"),
+        physically_challenged=request.form.get("physically_challenged"),
+        category=request.form.get("category"),
+        aadhaar_no=request.form.get("aadhaar_no"),
+        father_name=request.form.get("father_name"),
+        mother_name=request.form.get("mother_name"),
+        father_occupation=request.form.get("father_occupation"),
+        mother_occupation=request.form.get("mother_occupation"),
+        father_phone=request.form.get("father_phone"),
+        mother_phone=request.form.get("mother_phone"),
+        correspondence_city=request.form.get("correspondence_city"),
+        correspondence_pincode=request.form.get("correspondence_pincode"),
+        correspondence_state=request.form.get("correspondence_state"),
+        correspondence_country=request.form.get("correspondence_country"),
+        correspondence_tel=request.form.get("correspondence_tel"),
+        correspondence_mobile=request.form.get("correspondence_mobile"),
+        permanent_city=request.form.get("permanent_city"),
+        permanent_pincode=request.form.get("permanent_pincode"),
+        permanent_state=request.form.get("permanent_state"),
+        permanent_country=request.form.get("permanent_country"),
+        permanent_tel=request.form.get("permanent_tel"),
+        permanent_mobile=request.form.get("permanent_mobile"),
+        preferred_contact_time=request.form.get("preferred_contact_time"),
+        passport=request.form.get("passport"),
+        passport_no=request.form.get("passport_no"),
+        passport_expiry=request.form.get("passport_expiry"),
+        passport_issued_on=request.form.get("passport_issued_on")
+
+        session['page2_data'] = {
+            "application_number":application_number,
+            "admission_type":admission_type ,
+            "pgcet_no":pgcet_no,
+            "admission_order_no": admission_order_no,
+            "rank": rank,
+            "claimed_category":claimed_category ,
+            "allocated_category":allocated_category ,
+            "locality": locality,
+            "first_name": first_name,
+            "middle_name":middle_name ,
+            "surname": surname,
+            "dob":dob ,
+            "gender": gender,
+            "nationality":nationality ,
+            "religion": religion,
+            "blood_group":blood_group ,
+            "physically_challenged":physically_challenged ,
+            "category":category ,
+            "aadhaar_no": aadhaar_no,
+            "father_name":father_name,
+            "mother_name":mother_name ,
+            "father_occupation": father_occupation,
+            "mother_occupation": mother_occupation,
+            "father_phone": father_phone,
+            "mother_phone":mother_phone ,
+            "correspondence_city":correspondence_city ,
+            "correspondence_pincode":correspondence_pincode ,
+            "correspondence_state":correspondence_state,
+            "correspondence_country":correspondence_country ,
+            "correspondence_tel": correspondence_tel,
+            "correspondence_mobile":correspondence_mobile,
+            "permanent_city": permanent_city,
+            "permanent_pincode":permanent_pincode ,
+            "permanent_state": permanent_state,
+            "permanent_country": permanent_country,
+            "permanent_tel": permanent_tel,
+            "permanent_mobile":permanent_mobile ,
+            "preferred_contact_time":preferred_contact_time ,
+            "passport": passport,
+            "passport_no": passport_no,
+            "passport_expiry":passport_expiry ,
+            "passport_issued_on": passport_issued_on
         }
 
-        page2_collection.insert_one(form_data)
-        session['progress']['page2']=True
-        session.modified = True
+        if 'save' in request.form:
+
+            form_data = {
+                "application_number":application_number,
+                "admission_type":admission_type ,
+                "pgcet_no":pgcet_no,
+                "admission_order_no": admission_order_no,
+                "rank": rank,
+                "claimed_category":claimed_category ,
+                "allocated_category":allocated_category ,
+                "locality": locality,
+                "first_name": first_name,
+                "middle_name":middle_name ,
+                "surname": surname,
+                "dob":dob ,
+                "gender": gender,
+                "nationality":nationality ,
+                "religion": religion,
+                "blood_group":blood_group ,
+                "physically_challenged":physically_challenged ,
+                "category":category ,
+                "aadhaar_no": aadhaar_no,
+                "father_name":father_name,
+                "mother_name":mother_name ,
+                "father_occupation": father_occupation,
+                "mother_occupation": mother_occupation,
+                "father_phone": father_phone,
+                "mother_phone":mother_phone ,
+                "correspondence_city":correspondence_city ,
+                "correspondence_pincode":correspondence_pincode ,
+                "correspondence_state":correspondence_state,
+                "correspondence_country":correspondence_country ,
+                "correspondence_tel": correspondence_tel,
+                "correspondence_mobile":correspondence_mobile,
+                "permanent_city": permanent_city,
+                "permanent_pincode":permanent_pincode ,
+                "permanent_state": permanent_state,
+                "permanent_country": permanent_country,
+                "permanent_tel": permanent_tel,
+                "permanent_mobile":permanent_mobile ,
+                "preferred_contact_time":preferred_contact_time ,
+                "passport": passport,
+                "passport_no": passport_no,
+                "passport_expiry":passport_expiry ,
+                "passport_issued_on": passport_issued_on
+            }
+
+            try:
+                page2_collection.insert_one(form_data)
+                session['progress']['page2']=True
+                session.modified = True
+            except ConnectionError as e:
+                flash(f"Error connecting to MongoDB: {e}")
+                return redirect(url_for('app_form.page2'))
         return redirect(url_for('app_form.page3'))
 
-    return render_template('page2.html')
+    page2_data=session.get('page2_data',{})
+    return render_template('page2.html',page2_data=page2_data)
 
 
 @app_form.route('/page3',methods=['POST','GET'])

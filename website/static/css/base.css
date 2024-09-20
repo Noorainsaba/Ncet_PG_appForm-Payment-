@@ -126,12 +126,12 @@ footer {
 }
 
 .page.completed {
-    background-color: #4caf50; /* Green for completed */
+    background-color: #4caf50; 
     color: white;
 }
 
 .page.active {
-    background-color: #9e9e9e; /* Grey for current page */
+    background-color: #9e9e9e; 
 }
 
 .form-content {
@@ -171,5 +171,5 @@ button:hover {
 }
 
 .page {
-    cursor: pointer; /* Change cursor to pointer */
+    cursor: pointer; 
 }

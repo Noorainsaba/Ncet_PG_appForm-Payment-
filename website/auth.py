@@ -12,6 +12,7 @@ auth=Blueprint('auth',__name__)
 
 @auth.route('/')
 def LandingPage():
+    session['signin']=False
     return render_template('LandingPage.html')
 
 
