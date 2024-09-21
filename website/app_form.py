@@ -9,50 +9,78 @@ import io
 from flask import send_file,jsonify
 import json
 from bson import ObjectId
+import re
 
 app_form=Blueprint('app_form',__name__)
 
 
-@app_form.route('/page1', methods=['POST','GET'])
+# @app_form.route('/page1', methods=['POST','GET'])
+# def page1():
+#     if 'signin' not in session or not session['signin']:
+#         return redirect(url_for('auth.signin'))
+    
+#     if request.method=='POST':
+#         name = request.form['name']
+#         email = request.form['email']
+#         age = request.form.get('age', type=int)
+#         message = request.form['message']
+
+#         # temporarily storing data,even after user clicks back option from the popup
+#         session['page1_data']={
+#             'name':name,
+#             'email':email,
+#             'age':age,
+#             'message':message
+#         }
+
+#         contact_data = {
+#             "application_number":session.get("application_number"),
+#             'name': name,
+#             'email': email,
+#             'age': age,
+#             'message': message
+#         }
+
+#         # Insert data into MongoDB
+#         try:
+#             page1_collection.insert_one(contact_data)
+#             session['progress']['page1']=True
+#             session.modified = True
+#             return redirect(url_for('app_form.page2'))
+#         except ConnectionError as e:
+#             flash(f"Error connecting to MongoDB: {e}")
+#             return redirect(url_for('app_form.page1'))
+        
+    
+#     page1_data=session.get('page1_data',{})
+#     return render_template('page1.html',page1_data=page1_data)
+
+@app_form.route('/page1', methods=['POST', 'GET'])
 def page1():
     if 'signin' not in session or not session['signin']:
         return redirect(url_for('auth.signin'))
-    if request.method=='POST':
-        name = request.form['name']
-        email = request.form['email']
-        age = request.form.get('age', type=int)
-        message = request.form['message']
+    if request.method == 'POST':
+        candidate_name = request.form.get('candidateName')
+        documents = request.form.getlist('documents')
+        other_documents = request.form.get('other_documents')
 
-        # temporarily storing data,even after user clicks back option from the popup
-        session['page1_data']={
-            'name':name,
-            'email':email,
-            'age':age,
-            'message':message
+        form_data = {
+            "application_number": session.get('application_number'),
+            "candidate_name": candidate_name,
+            "documents": documents,
+            "other_documents": other_documents
         }
 
-        contact_data = {
-            "application_number":session.get("application_number"),
-            'name': name,
-            'email': email,
-            'age': age,
-            'message': message
-        }
-
-        # Insert data into MongoDB
         try:
-            page1_collection.insert_one(contact_data)
+            page1_collection.insert_one(form_data)
             session['progress']['page1']=True
             session.modified = True
             return redirect(url_for('app_form.page2'))
         except ConnectionError as e:
-            flash(f"Error connecting to MongoDB: {e}")
+            flash(f"Error Submitting data,Please try again!: {e}")
             return redirect(url_for('app_form.page1'))
         
-    
-    page1_data=session.get('page1_data',{})
-    return render_template('page1.html',page1_data=page1_data)
-
+    return render_template('page1.html')
 
 @app_form.route('/page2', methods=['POST','GET'])
 def page2():

@@ -24,54 +24,75 @@
 <form id="myForm" action="{{url_for('app_form.page2')}}" method="POST" enctype="multipart/form-data">
     <!-- Admission Type -->
     <div class="form-group">
-        <label>Admission Type:</label>
+        <label>Admission Type:<span class="required-star">*</span></label>
         <div class="radio-group">
-            <input type="radio" name="admission_type" value="pgcet_quota"> PGCET QUOTA
-            <input type="radio" name="admission_type" value="management_quota"> MANAGEMENT QUOTA
+            <input type="radio" name="admission_type" value="pgcet_quota" id="pgcet_quota" checked onclick="toggleDetails()"> PGCET QUOTA
+            <input type="radio" name="admission_type" value="management_quota" id="management_quota" onclick="toggleDetails()"> MANAGEMENT QUOTA
         </div>
     </div>
-
+    
     <!-- PGCET No, Admission Order No, Rank (all in one line) -->
-    <div class="form-group inline-group">
+    <div class="form-group inline-group" id="pgcet-details">
         <div>
-            <label for="pgcet_no">PGCET No:</label>
+            <label for="pgcet_no">PGCET No:<span class="required-star">*</span></label>
             <input type="text" id="pgcet_no" name="pgcet_no">
         </div>
         <div>
-            <label for="admission_order_no">Admission Order No:</label>
+            <label for="admission_order_no">Admission Order No:<span class="required-star">*</span></label>
             <input type="text" id="admission_order_no" name="admission_order_no">
         </div>
         <div>
-            <label for="rank">Rank:</label>
+            <label for="rank">Rank:<span class="required-star">*</span></label>
             <input type="text" id="rank" name="rank">
         </div>
     </div>
-
-    <!-- Claimed Category, Allocated Category, KAR/NON-KAR (all in one line) -->
-    <div class="form-group inline-group">
+    
+    <!-- Claimed Category, Allocated Category, Locality (all in one line) -->
+    <div class="form-group inline-group" id="category-details">
         <div>
-            <label>Claimed Category:</label>
+            <label>Claimed Category:<span class="required-star">*</span></label>
             <input type="text" name="claimed_category">
         </div>
         <div>
-            <label>Allocated Category:</label>
+            <label>Allocated Category:<span class="required-star">*</span></label>
             <input type="text" name="allocated_category">
         </div>
         <div>
-            <label>Locality:</label>
+            <label>Locality:<span class="required-star">*</span></label>
             <div class="radio-group">
                 <input type="radio" name="locality" value="kar"> Kar
                 <input type="radio" name="locality" value="non-kar"> Non-Kar
             </div>
         </div>
     </div>
+    
+    <script>
+        function toggleDetails() {
+            const managementQuotaSelected = document.getElementById('management_quota').checked;
+            const pgcetDetails = document.getElementById('pgcet-details');
+            const categoryDetails = document.getElementById('category-details');
+            
+            // Show or hide the details based on selected admission type
+            if (managementQuotaSelected) {
+                pgcetDetails.style.display = 'none';
+                categoryDetails.style.display = 'none'; // Hide category details
+            } else {
+                pgcetDetails.style.display = 'flex'; // or 'block' depending on your layout
+                categoryDetails.style.display = 'flex'; // or 'block'
+            }
+        }
+    
+        // Initial call to set the display based on default selection
+        toggleDetails();
+    </script>
+    
 
     <!-- Personal Details -->
     <div class="section-header">Personal Details (as per SSLC Certificate)</div>
     <div class="form-group">
         <label>Name:</label>
         <div class="inline-group">
-            <input type="text" name="first_name" placeholder="First Name">
+            <input type="text" name="first_name" placeholder="First Name" required>
             <input type="text" name="middle_name" placeholder="Middle Name">
             <input type="text" name="surname" placeholder="Surname">
         </div>

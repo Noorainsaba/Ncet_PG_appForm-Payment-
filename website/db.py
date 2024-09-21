@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 
 def get_db():
-    client=MongoClient("mongodb+srv://Ncet_ApplicationForm_Payments:Ncet_ApplicationForm(Payments)@cluster0.bok10.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+    client=MongoClient("mongodb+srv://NCET-PG_Applications_Gateway:NCET-PG_Applications_Gateway@applicationform.ar70l.mongodb.net/?retryWrites=true&w=majority&appName=ApplicationForm")
     db=client["Ncet_ApplicationForm(Payments)"] #db name
     return db
 
