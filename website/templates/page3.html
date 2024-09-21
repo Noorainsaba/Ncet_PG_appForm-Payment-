@@ -5,7 +5,8 @@
 {% endblock %}
 {% block content %}
 <h3>Education Qualifications</h3>
-    <form action="{{url_for('app_form.page3')}}" method="POST">
+<div id="contentContainer">
+    <form id="myForm" action="{{url_for('app_form.page3')}}" method="POST">
         <table border="1">
             <thead>
                 <tr>
@@ -189,17 +190,46 @@
             <input type="checkbox" id="no_exams" name="no_exams">
         </div>
 
-        <br>
-        <input type="submit" value="Save and Proceed">
+        <div class="section">
+        <button type="submit" name="save" onclick="showConfirmationPopup(event)">Save and Proceed</button>
+        </div>
     </form>
+</div>
+<div id="confirmationPopup" style="display:none; position:fixed; top: 50%; transform: translate(50%,-50%); background:white; padding:20px; border:10px solid #ccc;">
+    <p>Once clicked on save, you won't be able to modify the details.Are you sure?</p>
+    <button onclick="closePopup()">Back</button>
+    <button onclick="saveAndProceed()">Save</button>
+</div>
 
-    <script>
-        document.querySelectorAll('input[name="work_experience"]').forEach(function(el) {
-            el.addEventListener('change', function() {
-                document.getElementById('work_experience_details').style.display = this.value === 'Yes' ? 'block' : 'none';
-            });
+<div id="overlay" class="overlay" style="display:none;"></div>
+<script>
+function showConfirmationPopup(event){
+    event.preventDefault();
+    const overlay = document.querySelector('.overlay');
+    overlay.style.display = 'flex';
+    document.getElementById("confirmationPopup").style.display="block";
+    document.getElementById("overlay").style.display="block";
+    document.getElementById('contentContainer').classList.add('blur');
+}
+
+function closePopup(){
+    document.getElementById("confirmationPopup").style.display="none";
+    document.getElementById("overlay").style.display="none";
+    document.getElementById('contentContainer').classList.remove('blur');
+}
+
+function saveAndProceed(){
+    document.getElementById("myForm").submit();
+}
+</script>
+
+<script>
+    document.querySelectorAll('input[name="work_experience"]').forEach(function(el) {
+        el.addEventListener('change', function() {
+            document.getElementById('work_experience_details').style.display = this.value === 'Yes' ? 'block' : 'none';
         });
-    </script>
+    });
+</script>
 {% endblock %}
 
 

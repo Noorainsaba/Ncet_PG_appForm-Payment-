@@ -31,24 +31,24 @@ def page1():
             'message':message
         }
 
-        if 'save' in request.form:
-            contact_data = {
-                "application_number":session.get("application_number"),
-                'name': name,
-                'email': email,
-                'age': age,
-                'message': message
-            }
+        contact_data = {
+            "application_number":session.get("application_number"),
+            'name': name,
+            'email': email,
+            'age': age,
+            'message': message
+        }
 
-            # Insert data into MongoDB
-            try:
-                page1_collection.insert_one(contact_data)
-                session['progress']['page1']=True
-                session.modified = True
-            except ConnectionError as e:
-                flash(f"Error connecting to MongoDB: {e}")
-                return redirect(url_for('app_form.page1'))
-        return redirect(url_for('app_form.page2'))
+        # Insert data into MongoDB
+        try:
+            page1_collection.insert_one(contact_data)
+            session['progress']['page1']=True
+            session.modified = True
+            return redirect(url_for('app_form.page2'))
+        except ConnectionError as e:
+            flash(f"Error connecting to MongoDB: {e}")
+            return redirect(url_for('app_form.page1'))
+        
     
     page1_data=session.get('page1_data',{})
     return render_template('page1.html',page1_data=page1_data)
@@ -61,51 +61,53 @@ def page2():
     if not session['progress']['page1']:
         return redirect(url_for('app_form.page1'))
     if request.method=='POST':
-        application_number=session.get("application_number"),
-        admission_type=request.form.get("admission_type"),
-        pgcet_no=request.form.get("pgcet_no"),
-        admission_order_no=request.form.get("admission_order_no"),
-        rank=request.form.get("rank"),
-        claimed_category=request.form.get("claimed_category"),
-        allocated_category=request.form.get("allocated_category"),
-        locality=request.form.get("admission_type"),
-        first_name=request.form.get("first_name"),
-        middle_name=request.form.get("middle_name"),
-        surname=request.form.get("surname"),
-        dob=request.form.get("dob"),
-        gender=request.form.get("gender"),
-        nationality=request.form.get("nationality"),
-        religion=request.form.get("religion"),
-        blood_group=request.form.get("blood_group"),
-        physically_challenged=request.form.get("physically_challenged"),
-        category=request.form.get("category"),
-        aadhaar_no=request.form.get("aadhaar_no"),
-        father_name=request.form.get("father_name"),
-        mother_name=request.form.get("mother_name"),
-        father_occupation=request.form.get("father_occupation"),
-        mother_occupation=request.form.get("mother_occupation"),
-        father_phone=request.form.get("father_phone"),
-        mother_phone=request.form.get("mother_phone"),
-        correspondence_city=request.form.get("correspondence_city"),
-        correspondence_pincode=request.form.get("correspondence_pincode"),
-        correspondence_state=request.form.get("correspondence_state"),
-        correspondence_country=request.form.get("correspondence_country"),
-        correspondence_tel=request.form.get("correspondence_tel"),
-        correspondence_mobile=request.form.get("correspondence_mobile"),
-        permanent_city=request.form.get("permanent_city"),
-        permanent_pincode=request.form.get("permanent_pincode"),
-        permanent_state=request.form.get("permanent_state"),
-        permanent_country=request.form.get("permanent_country"),
-        permanent_tel=request.form.get("permanent_tel"),
-        permanent_mobile=request.form.get("permanent_mobile"),
-        preferred_contact_time=request.form.get("preferred_contact_time"),
-        passport=request.form.get("passport"),
-        passport_no=request.form.get("passport_no"),
-        passport_expiry=request.form.get("passport_expiry"),
+        application_number=session.get("application_number")
+        admission_type=request.form.get("admission_type")
+        pgcet_no=request.form.get("pgcet_no")
+        admission_order_no=request.form.get("admission_order_no")
+        rank=request.form.get("rank")
+        claimed_category=request.form.get("claimed_category")
+        allocated_category=request.form.get("allocated_category")
+        locality=request.form.get("admission_type")
+        first_name=request.form.get("first_name")
+        middle_name=request.form.get("middle_name")
+        surname=request.form.get("surname")
+        dob=request.form.get("dob")
+        gender=request.form.get("gender")
+        nationality=request.form.get("nationality")
+        religion=request.form.get("religion")
+        blood_group=request.form.get("blood_group")
+        physically_challenged=request.form.get("physically_challenged")
+        category=request.form.get("category")
+        aadhaar_no=request.form.get("aadhaar_no")
+        father_name=request.form.get("father_name")
+        mother_name=request.form.get("mother_name")
+        father_occupation=request.form.get("father_occupation")
+        mother_occupation=request.form.get("mother_occupation")
+        father_phone=request.form.get("father_phone")
+        mother_phone=request.form.get("mother_phone")
+        correspondence_city=request.form.get("correspondence_city")
+        correspondence_pincode=request.form.get("correspondence_pincode")
+        correspondence_state=request.form.get("correspondence_state")
+        correspondence_country=request.form.get("correspondence_country")
+        correspondence_tel=request.form.get("correspondence_tel")
+        correspondence_mobile=request.form.get("correspondence_mobile")
+        permanent_city=request.form.get("permanent_city")
+        permanent_pincode=request.form.get("permanent_pincode")
+        permanent_state=request.form.get("permanent_state")
+        permanent_country=request.form.get("permanent_country")
+        permanent_tel=request.form.get("permanent_tel")
+        permanent_mobile=request.form.get("permanent_mobile")
+        preferred_contact_time=request.form.get("preferred_contact_time")
+        passport=request.form.get("passport")
+        passport_no=request.form.get("passport_no")
+        passport_expiry=request.form.get("passport_expiry")
         passport_issued_on=request.form.get("passport_issued_on")
 
-        session['page2_data'] = {
-            "application_number":application_number,
+
+
+        form_data = {
+            "application_number": str(application_number) if isinstance(application_number, ObjectId) else application_number,
             "admission_type":admission_type ,
             "pgcet_no":pgcet_no,
             "admission_order_no": admission_order_no,
@@ -148,65 +150,21 @@ def page2():
             "passport_expiry":passport_expiry ,
             "passport_issued_on": passport_issued_on
         }
+        # session['page2_data']=form_data
+        # session.modified=True
 
-        if 'save' in request.form:
+        try:
+            page2_collection.insert_one(form_data)
+            session['progress']['page2']=True
+            session.modified = True
+            return redirect(url_for('app_form.page3'))
+        except ConnectionError as e:
+            flash(f"Error connecting to MongoDB: {e}")
+            return redirect(url_for('app_form.page2'))
+        
 
-            form_data = {
-                "application_number":application_number,
-                "admission_type":admission_type ,
-                "pgcet_no":pgcet_no,
-                "admission_order_no": admission_order_no,
-                "rank": rank,
-                "claimed_category":claimed_category ,
-                "allocated_category":allocated_category ,
-                "locality": locality,
-                "first_name": first_name,
-                "middle_name":middle_name ,
-                "surname": surname,
-                "dob":dob ,
-                "gender": gender,
-                "nationality":nationality ,
-                "religion": religion,
-                "blood_group":blood_group ,
-                "physically_challenged":physically_challenged ,
-                "category":category ,
-                "aadhaar_no": aadhaar_no,
-                "father_name":father_name,
-                "mother_name":mother_name ,
-                "father_occupation": father_occupation,
-                "mother_occupation": mother_occupation,
-                "father_phone": father_phone,
-                "mother_phone":mother_phone ,
-                "correspondence_city":correspondence_city ,
-                "correspondence_pincode":correspondence_pincode ,
-                "correspondence_state":correspondence_state,
-                "correspondence_country":correspondence_country ,
-                "correspondence_tel": correspondence_tel,
-                "correspondence_mobile":correspondence_mobile,
-                "permanent_city": permanent_city,
-                "permanent_pincode":permanent_pincode ,
-                "permanent_state": permanent_state,
-                "permanent_country": permanent_country,
-                "permanent_tel": permanent_tel,
-                "permanent_mobile":permanent_mobile ,
-                "preferred_contact_time":preferred_contact_time ,
-                "passport": passport,
-                "passport_no": passport_no,
-                "passport_expiry":passport_expiry ,
-                "passport_issued_on": passport_issued_on
-            }
-
-            try:
-                page2_collection.insert_one(form_data)
-                session['progress']['page2']=True
-                session.modified = True
-            except ConnectionError as e:
-                flash(f"Error connecting to MongoDB: {e}")
-                return redirect(url_for('app_form.page2'))
-        return redirect(url_for('app_form.page3'))
-
-    page2_data=session.get('page2_data',{})
-    return render_template('page2.html',page2_data=page2_data)
+    # page2_data=session.get('page2_data',{})
+    return render_template('page2.html')
 
 
 @app_form.route('/page3',methods=['POST','GET'])
@@ -216,86 +174,98 @@ def page3():
     if not session['progress']['page2']:
         return redirect(url_for('app_form.page2'))
     if request.method=='POST':
-        education_data ={
-            "10th_standard":{
-                "course":request.form.get("course_10"),
-                "board_university":request.form.get("board_university_10"),
-                "college_name":request.form.get("college_name_10"),
-                "year_from":request.form.get("year_from_10"),
-                "year_to": request.form.get("year_to_10"),
-                "grade": request.form.get("grade_10")
-            },
-            "12th_standard": {
-                "course": request.form.get("course_12"),
-                "board_university": request.form.get("board_university_12"),
-                "college_name": request.form.get("college_name_12"),
-                "year_from": request.form.get("year_from_12"),
-                "year_to": request.form.get("year_to_12"),
-                "grade": request.form.get("grade_12")
-            },
-            "graduation": {
-                "course": request.form.get("course_ug"),
-                "board_university": request.form.get("board_university_ug"),
-                "college_name": request.form.get("college_name_ug"),
-                "year_from": request.form.get("year_from_ug"),
-                "year_to": request.form.get("year_to_ug"),
-                "grade": request.form.get("grade_ug")
-            },
-            "post_graduation": {
-                "course": request.form.get("course_pg"),
-                "board_university": request.form.get("board_university_pg"),
-                "college_name": request.form.get("college_name_pg"),
-                "year_from": request.form.get("year_from_pg"),
-                "year_to": request.form.get("year_to_pg"),
-                "grade": request.form.get("grade_pg")
-            },
-            "others": {
-                "course": request.form.get("course_ot"),
-                "board_university": request.form.get("board_university_ot"),
-                "college_name": request.form.get("college_name_ot"),
-                "year_from": request.form.get("year_from_ot"),
-                "year_to": request.form.get("year_to_ot"),
-                "grade": request.form.get("grade_ot")
+        # save_button=request.form.get('save',None)
+        try:
+            education_data ={
+                "10th_standard":{
+                    "course":request.form.get("course_10"),
+                    "board_university":request.form.get("board_university_10"),
+                    "college_name":request.form.get("college_name_10"),
+                    "year_from":request.form.get("year_from_10"),
+                    "year_to": request.form.get("year_to_10"),
+                    "grade": request.form.get("grade_10")
+                },
+                "12th_standard": {
+                    "course": request.form.get("course_12"),
+                    "board_university": request.form.get("board_university_12"),
+                    "college_name": request.form.get("college_name_12"),
+                    "year_from": request.form.get("year_from_12"),
+                    "year_to": request.form.get("year_to_12"),
+                    "grade": request.form.get("grade_12")
+                },
+                "graduation": {
+                    "course": request.form.get("course_ug"),
+                    "board_university": request.form.get("board_university_ug"),
+                    "college_name": request.form.get("college_name_ug"),
+                    "year_from": request.form.get("year_from_ug"),
+                    "year_to": request.form.get("year_to_ug"),
+                    "grade": request.form.get("grade_ug")
+                },
+                "post_graduation": {
+                    "course": request.form.get("course_pg"),
+                    "board_university": request.form.get("board_university_pg"),
+                    "college_name": request.form.get("college_name_pg"),
+                    "year_from": request.form.get("year_from_pg"),
+                    "year_to": request.form.get("year_to_pg"),
+                    "grade": request.form.get("grade_pg")
+                },
+                "others": {
+                    "course": request.form.get("course_ot"),
+                    "board_university": request.form.get("board_university_ot"),
+                    "college_name": request.form.get("college_name_ot"),
+                    "year_from": request.form.get("year_from_ot"),
+                    "year_to": request.form.get("year_to_ot"),
+                    "grade": request.form.get("grade_ot")
+                }
             }
-        }
-        work_experience_data = {
-            'work_experience': request.form.get('work_experience'),
-            'total_years': request.form.get('total_years'),
-            'work_from': request.form.get('work_from'),
-            'work_to': request.form.get('work_to'),
-            'organization': request.form.get('organization'),
-            'awards': request.form.get('awards'),
-            'interests': request.form.get('interests'),
-        }
+            work_experience_data = {
+                'work_experience': request.form.get('work_experience'),
+                'total_years': request.form.get('total_years'),
+                'work_from': request.form.get('work_from'),
+                'work_to': request.form.get('work_to'),
+                'organization': request.form.get('organization'),
+                'awards': request.form.get('awards'),
+                'interests': request.form.get('interests'),
+            }
 
-        finance_data = {
-            'family_income': request.form.get('family_income'),
-            'finance_source': request.form.getlist('finance_source'),
-        }
+            finance_data = {
+                'family_income': request.form.get('family_income'),
+                'finance_source': request.form.getlist('finance_source'),
+            }
 
-        entrance_test_data = {
-            'entrance_test': request.form.getlist('entrance_test'),
-            'other_tests_specify': request.form.get('other_tests_specify'),
-            'test_score': request.form.get('test_score'),
-            'registration_no': request.form.get('registration_no'),
-            'exam_date': request.form.get('exam_date'),
-            'no_exams': 'no_exams' in request.form,
-        }
+            entrance_test_data = {
+                'entrance_test': request.form.getlist('entrance_test'),
+                'other_tests_specify': request.form.get('other_tests_specify'),
+                'test_score': request.form.get('test_score'),
+                'registration_no': request.form.get('registration_no'),
+                'exam_date': request.form.get('exam_date'),
+                'no_exams': 'no_exams' in request.form,
+            }
 
-        # Combine all data into a single document
-        form_data = {
-            "application_number":session.get("application_number"),
-            'education': education_data,
-            'work_experience': work_experience_data,
-            'finance': finance_data,
-            'entrance_tests': entrance_test_data,
-        }
+            # Combine all data into a single document
+            form_data = {
+                "application_number":session.get("application_number"),
+                'education': education_data,
+                'work_experience': work_experience_data,
+                'finance': finance_data,
+                'entrance_tests': entrance_test_data,
+            }
+            
 
-        # Insert data into MongoDB collection
-        page3_collection.insert_one(form_data)
-        session['progress']['page3']=True
-        session.modified = True
-        return redirect(url_for('app_form.page4'))
+            # Insert data into MongoDB collection
+            try:
+                page3_collection.insert_one(form_data)
+                session['progress']['page3']=True
+                session.modified = True
+                return redirect(url_for('app_form.page4'))
+            except Exception as e:
+                flash('Error While submitting the data, Please try again!',e)
+                return redirect(url_for('app_form.page3'))
+        except Exception as e:
+            flash('Error While submitting the data, Please try again!',e)
+            return redirect(url_for('app_form.page3'))
+    
+    # page2_data=session.get('page2_data',{})
     return render_template("page3.html")
 
 @app_form.route('/page4',methods=['GET'])
