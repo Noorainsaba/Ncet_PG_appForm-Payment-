@@ -503,6 +503,7 @@ def signout():
     # clearing session
     session.pop('user',None)
     session.pop('application_number',None)
+    
 
     flash('You have been signed out!','success')
     return redirect(url_for('auth.signin'))
@@ -517,8 +518,11 @@ def home():
     user_name=session.get('user')
     application_number=session.get('application_number')
     
+
     if 'progress' not in session:
         session['progress'] = {'page1':False,'page2':False,'page3':False}
+    
+
     return redirect(url_for('app_form.page1'))
 
     # Pass the completion status to the template

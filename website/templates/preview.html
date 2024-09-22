@@ -1,70 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Data Preview</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .container {
-            max-width: 800px;
-            margin: auto;
-        }
-        .data-section {
-            margin-bottom: 20px;
-        }
-        .data-section h2 {
-            font-size: 1.5em;
-            margin-bottom: 10px;
-        }
-        .data-section p {
-            margin: 5px 0;
-        }
-        .download-button {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-        .download-button:hover {
-            background-color: #0056b3;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Form Data Preview</h1>
-        
-        <!-- Display the data from page1, page2, and page3 -->
-        <div class="data-section">
-            <h2>Page 1 Data</h2>
-            {% for key, value in data.page1_data.items() %}
-                <p><strong>{{ key }}:</strong> {{ value }}</p>
-            {% endfor %}
-        </div>
+{% extends 'base.html' %}
 
-        <div class="data-section">
-            <h2>Page 2 Data</h2>
-            {% for key, value in data.page2_data.items() %}
-                <p><strong>{{ key }}:</strong> {{ value }}</p>
-            {% endfor %}
-        </div>
+{% block title %}Application form preview{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="{{url_for('static', filename='css/preview.css') }}">
+{% endblock %}
+{% block content %}
+<div class="container">
+    <h1>Application Form Preview</h1>
 
+    {% if data.page1_data %}
         <div class="data-section">
-            <h2>Page 3 Data</h2>
-            {% for key, value in data.page3_data.items() %}
-                <p><strong>{{ key }}:</strong> {{ value }}</p>
-            {% endfor %}
+            <h3>Page 1 Details</h3>
+            <ul class="list-group">
+                {% for key, value in data.page1_data.items() %}
+                    <li class="list-group-item"><strong>{{ key }}:</strong> {{ value }}</li>
+                {% endfor %}
+            </ul>
         </div>
+    {% endif %}
 
-        <!-- Button to download the PDF -->
-        <a href="{{ url_for('fetch_data') }}" class="download-button">Download PDF</a>
+    {% if data.page2_data %}
+        <div class="data-section">
+            <h3>Page 2 Details</h3>
+            <ul class="list-group">
+                {% for key, value in data.page2_data.items() %}
+                    <li class="list-group-item"><strong>{{ key }}:</strong> {{ value }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if data.page3_data %}
+        <div class="data-section">
+            <h3>Page 3 Details</h3>
+            <ul class="list-group">
+                {% for key, value in data.page3_data.items() %}
+                    <li class="list-group-item"><strong>{{ key }}:</strong> {{ value }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <div class="text-center">
+        <form action="{{ url_for('app_form.download_pdf') }}" method="POST">
+            <input type="hidden" name="application_number" value="{{ data.page1_data.application_number }}">
+            <button type="submit" class="btn btn-primary">Download PDF</button>
+        </form>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

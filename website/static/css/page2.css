@@ -174,3 +174,7 @@ input[type="submit"]:hover {
 button {
     margin: 5px;
 }
+.required-star {
+    color: red;        /* Change text color to red */
+    font-weight: bold; /* Make font weight bold */
+}

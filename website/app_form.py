@@ -1,6 +1,7 @@
 from flask import Blueprint,render_template,request,redirect,url_for,session,flash
 from pymongo import MongoClient
-from .db import page2_collection,page1_collection,page3_collection
+# from pymongo.errors import ConnectionError
+from .db import page2_collection,page1_collection,page3_collection,page4_collection
 
 # pdf imports
 from reportlab.lib.pagesizes import letter
@@ -13,52 +14,30 @@ import re
 
 app_form=Blueprint('app_form',__name__)
 
+def page1_locked(application_number):
+    lock_status=page1_collection.find_one({"application_number":application_number,"locked":True})
+    return lock_status is not None
 
-# @app_form.route('/page1', methods=['POST','GET'])
-# def page1():
-#     if 'signin' not in session or not session['signin']:
-#         return redirect(url_for('auth.signin'))
-    
-#     if request.method=='POST':
-#         name = request.form['name']
-#         email = request.form['email']
-#         age = request.form.get('age', type=int)
-#         message = request.form['message']
-
-#         # temporarily storing data,even after user clicks back option from the popup
-#         session['page1_data']={
-#             'name':name,
-#             'email':email,
-#             'age':age,
-#             'message':message
-#         }
-
-#         contact_data = {
-#             "application_number":session.get("application_number"),
-#             'name': name,
-#             'email': email,
-#             'age': age,
-#             'message': message
-#         }
-
-#         # Insert data into MongoDB
-#         try:
-#             page1_collection.insert_one(contact_data)
-#             session['progress']['page1']=True
-#             session.modified = True
-#             return redirect(url_for('app_form.page2'))
-#         except ConnectionError as e:
-#             flash(f"Error connecting to MongoDB: {e}")
-#             return redirect(url_for('app_form.page1'))
-        
-    
-#     page1_data=session.get('page1_data',{})
-#     return render_template('page1.html',page1_data=page1_data)
+def lock_page1_for_user(application_number,page_name):
+    page1_collection.update_one(
+        {"application_number":application_number},
+         {"$set":{"locked":True}} )
 
 @app_form.route('/page1', methods=['POST', 'GET'])
 def page1():
     if 'signin' not in session or not session['signin']:
         return redirect(url_for('auth.signin'))
+    
+    application_number=session.get("application_number")
+
+    if page1_locked(application_number) and page2_locked(application_number) and page3_locked(application_number) and page4_locked(application_number):
+        flash('Application Submitted Successfully','success')
+        return redirect(url_for('app_form.preview'))
+
+    if page1_locked(application_number):
+        flash('Page1 id already submitted. You cannot edit it anymore.','error')
+        return redirect(url_for('app_form.page2'))
+
     if request.method == 'POST':
         candidate_name = request.form.get('candidateName')
         documents = request.form.getlist('documents')
@@ -72,22 +51,51 @@ def page1():
         }
 
         try:
-            page1_collection.insert_one(form_data)
+            page1_collection.update_one(
+                {"application_number":application_number},
+                {"$set":form_data},
+                upsert=True
+            )
             session['progress']['page1']=True
             session.modified = True
+
+            lock_page1_for_user(application_number,'page1')
             return redirect(url_for('app_form.page2'))
+        
         except ConnectionError as e:
             flash(f"Error Submitting data,Please try again!: {e}")
             return redirect(url_for('app_form.page1'))
         
     return render_template('page1.html')
 
+def page2_locked(application_number):
+    lock_status=page2_collection.find_one({"application_number":application_number,"locked":True})
+    return lock_status is not None
+
+def lock_page2_for_user(application_number,page_name):
+    page2_collection.update_one(
+        {"application_number":application_number},
+        {"$set":{"locked":True}}
+    )
+
 @app_form.route('/page2', methods=['POST','GET'])
 def page2():
     if 'signin' not in session or not session['signin']:
         return redirect(url_for('auth.signin'))
-    if not session['progress']['page1']:
+    if not session.get('progress', {}).get('page1'):
         return redirect(url_for('app_form.page1'))
+    
+    # check whether page2 already submitted
+    application_number=session.get("application_number")
+
+    if page1_locked(application_number) and page2_locked(application_number) and page3_locked(application_number) and page4_locked(application_number):
+        flash('Application Submitted Successfully','success')
+        return redirect(url_for('app_form.preview'))
+
+    if page2_locked(application_number):
+        flash('Page 2 is already submitted. You cannot edit it anymore.','error')
+        return redirect(url_for('app_form.page3'))
+
     if request.method=='POST':
         application_number=session.get("application_number")
         admission_type=request.form.get("admission_type")
@@ -178,31 +186,74 @@ def page2():
             "passport_expiry":passport_expiry ,
             "passport_issued_on": passport_issued_on
         }
-        # session['page2_data']=form_data
-        # session.modified=True
+   
+        required_fields = [
+            "pgcet_no", "admission_order_no", "rank", 
+            "claimed_category", "allocated_category", "locality", 
+            "first_name", "surname", "dob", "gender", "nationality", 
+            "religion", "blood_group", "physically_challenged", 
+            "category", "aadhaar_no", "father_name", "mother_name", 
+            "father_occupation", "mother_occupation", "father_phone", 
+            "mother_phone", "correspondence_city", "correspondence_pincode", 
+            "correspondence_state", "correspondence_country", 
+            "correspondence_mobile", "permanent_city", "permanent_pincode", 
+            "permanent_state", "permanent_country", "permanent_mobile", 
+            "preferred_contact_time", "passport"
+        ]
 
+        if request.form.get("passport") == "yes":
+            required_fields += ["passport_no", "passport_expiry", "passport_issued_on"]
+
+        if any(form_data[field] == "" for field in required_fields):
+            flash("Please enter the details in all the required fields.", "error")
+            return render_template('page2.html', form_data=form_data)
+        
         try:
-            page2_collection.insert_one(form_data)
+            page2_collection.update_one(
+                {"application_number":application_number},
+                {"$set":form_data},
+                upsert=True   #if application number doesn't exists it vl create
+            )
             session['progress']['page2']=True
             session.modified = True
-            return redirect(url_for('app_form.page3'))
-        except ConnectionError as e:
-            flash(f"Error connecting to MongoDB: {e}")
-            return redirect(url_for('app_form.page2'))
-        
 
-    # page2_data=session.get('page2_data',{})
+            # locks page for further editing
+            lock_page2_for_user(application_number,'page2')
+
+            return redirect(url_for('app_form.page3'))
+        except Exception as e:
+            flash(f"Error while submitting data.Please try again!{e}",'error')
+            return render_template('page2.html', form_data=form_data)
+        
     return render_template('page2.html')
 
+def page3_locked(application_number):
+    lock_status=page3_collection.find_one({"application_number":application_number,"locked":True})
+    return lock_status is not None
+
+def lock_page3_for_user(application_number,page_name):
+    page3_collection.update_one(
+        {"application_number":application_number},
+        {"$set":{"locked":True}}
+    )
 
 @app_form.route('/page3',methods=['POST','GET'])
 def page3():
     if 'signin' not in session or not session['signin']:
         return redirect(url_for('auth.signin'))
-    if not session['progress']['page2']:
+    if not session.get('progress', {}).get('page2'):
         return redirect(url_for('app_form.page2'))
+    
+    application_number=session.get("application_number")
+
+    if page1_locked(application_number) and page2_locked(application_number) and page3_locked(application_number) and page4_locked(application_number):
+        flash('Application Submitted Successfully','success')
+        return redirect(url_for('app_form.preview'))
+    
+    if page3_locked(application_number):
+        flash('Page 3 is already submitted. You cannot edit it anymore.','error')
+        return redirect(url_for('app_form.page4'))
     if request.method=='POST':
-        # save_button=request.form.get('save',None)
         try:
             education_data ={
                 "10th_standard":{
@@ -282,9 +333,16 @@ def page3():
 
             # Insert data into MongoDB collection
             try:
-                page3_collection.insert_one(form_data)
+                page3_collection.update_one(
+                {"application_number":application_number},
+                {"$set":form_data},
+                upsert=True   #if application number doesn't exists it vl create
+            )
                 session['progress']['page3']=True
                 session.modified = True
+
+                lock_page3_for_user(application_number,'page3')
+
                 return redirect(url_for('app_form.page4'))
             except Exception as e:
                 flash('Error While submitting the data, Please try again!',e)
@@ -296,13 +354,104 @@ def page3():
     # page2_data=session.get('page2_data',{})
     return render_template("page3.html")
 
-@app_form.route('/page4',methods=['GET'])
+def page4_locked(application_number):
+    lock_status=page4_collection.find_one({"application_number":application_number,"locked":True})
+    return lock_status is not None
+
+def lock_page4_for_user(application_number,page_name):
+    page4_collection.update_one(
+        {"application_number":application_number},
+        {"$set":{"locked":True}}
+    )
+
+@app_form.route('/page4',methods=['GET','POST'])
 def page4():
-    if not session['progress']['page3']:
-        return redirect(url_for('app_form.page2'))
+    if not session.get('progress', {}).get('page3'):
+        return redirect(url_for('app_form.page3'))
+    
     if 'signin' not in session or not session['signin']:
         return redirect(url_for('auth.signin'))
+    
+    application_number=session.get("application_number")
+
+    if page1_locked(application_number) and page2_locked(application_number) and page3_locked(application_number) and page4_locked(application_number):
+        flash('Application Submitted Successfully','success')
+        return redirect(url_for('app_form.preview'))
+    
+    if page4_locked(application_number):
+        flash('Final Submission of application is done. You cannot edit it anymore.','error')
+        return redirect(url_for('app_form.preview'))
+    
+    if request.method=="POST":
+        # Insert data into MongoDB collection
+            try:
+                page4_collection.insert_one({"application_number":application_number})
+                session['progress']['page4']=True
+                session.modified = True
+
+                lock_page4_for_user(application_number,'page4')
+
+                return redirect(url_for('app_form.preview'))
+            except Exception as e:
+                flash('Error While submitting the data, Please try again!',e)
+                return redirect(url_for('app_form.page4'))
+
     return render_template("page4.html")
+
+@app_form.route('/preview', methods=['GET'])
+def preview():
+    application_number =session.get("application_number")
+    page1_data=page1_collection.find_one({'application_number':application_number})
+    page2_data=page2_collection.find_one({'application_number':application_number})
+    page3_data=page3_collection.find_one({'application_number':application_number})
+
+    entire_form_data={
+        'page1_data':page1_data,
+        'page2_data':page2_data,
+        'page3_data':page3_data
+    }
+
+    return render_template('preview.html',data=entire_form_data)
+
+@app_form.route('/download_pdf', methods=['POST'])
+def download_pdf():
+    application_number = request.form.get('application_number')
+    
+    # Fetch data and generate PDF as shown in your previous code
+    page1_data = page1_collection.find_one({'application_number': application_number})
+    page2_data = page2_collection.find_one({'application_number': application_number})
+    page3_data = page3_collection.find_one({'application_number': application_number})
+
+    entire_form_data = {
+        'page1_data': page1_data,
+        'page2_data': page2_data,
+        'page3_data': page3_data
+    }
+    
+    entire_form_data = convert_objectid_to_str(entire_form_data)
+
+    # Create a PDF
+    pdf_buffer = io.BytesIO()
+    pdf = canvas.Canvas(pdf_buffer, pagesize=letter)
+    pdf.setTitle('Form Preview')
+
+    for page, data in entire_form_data.items():
+        text = pdf.beginText(40, 750)  # Start position (x, y)
+        text.setFont("Helvetica", 12)
+        text.textLine(f"{page.capitalize()}:")
+        
+        for key, value in data.items():
+            text.textLine(f"{key}: {value}")
+        
+        pdf.drawText(text)
+        pdf.showPage()  # Move to the next page after each section
+
+    pdf.save()
+    pdf_buffer.seek(0)
+
+    return send_file(pdf_buffer, as_attachment=True, download_name='NCET-PG Application.pdf')
+
+
 
 # def generate_pdf(data):
 #     # Create a byte stream buffer to hold the PDF data
@@ -338,101 +487,70 @@ def convert_objectid_to_str(data):
     else:
         return data
 
-@app_form.route('/fetch_data',methods=['POST'])
-def fetch_data():
-    application_number=request.form.get('application_number')
+# @app_form.route('/fetch_data',methods=['POST'])
+# def fetch_data():
+#     application_number=request.form.get('application_number')
 
-    page1_data=page1_collection.find_one({'application_number':application_number})
-    page2_data=page2_collection.find_one({'application_number':application_number})
-    page3_data=page3_collection.find_one({'application_number':application_number})
+#     page1_data=page1_collection.find_one({'application_number':application_number})
+#     page2_data=page2_collection.find_one({'application_number':application_number})
+#     page3_data=page3_collection.find_one({'application_number':application_number})
 
-    entireForm_data={
-        'page1_data':page1_data,
-        'page2_data':page2_data,
-        'page3_data':page3_data
-    }
+#     entireForm_data={
+#         'page1_data':page1_data,
+#         'page2_data':page2_data,
+#         'page3_data':page3_data
+#     }
 
-    entireForm_data = convert_objectid_to_str(entireForm_data)
+#     entireForm_data = convert_objectid_to_str(entireForm_data)
 
-    # Create a PDF
-    pdf_buffer = io.BytesIO()
-    pdf = canvas.Canvas(pdf_buffer, pagesize=letter)
-    pdf.setTitle('Form Preview')
+#     # Create a PDF
+#     pdf_buffer = io.BytesIO()
+#     pdf = canvas.Canvas(pdf_buffer, pagesize=letter)
+#     pdf.setTitle('Form Preview')
 
-    # Add content to the PDF
-    text = pdf.beginText(40, 750)  # Start position (x, y)
-    text.setFont("Helvetica", 12)
+#     # Add content to the PDF
+#     text = pdf.beginText(40, 750)  # Start position (x, y)
+#     text.setFont("Helvetica", 12)
 
-    for page, data in entireForm_data.items():
-        text.textLine(f"{page.capitalize()}:")
-        for key, value in data.items():
-            text.textLine(f"{key}: {value}")
-        text.textLine(" ")
+#     for page, data in entireForm_data.items():
+#         text.textLine(f"{page.capitalize()}:")
+#         for key, value in data.items():
+#             text.textLine(f"{key}: {value}")
+#         text.textLine(" ")
 
-    pdf.drawText(text)
-    pdf.showPage()
-    pdf.save()
+#     pdf.drawText(text)
+#     pdf.showPage()
+#     pdf.save()
 
-    pdf_buffer.seek(0)  # Move to the beginning of the BytesIO buffer
+#     pdf_buffer.seek(0)  # Move to the beginning of the BytesIO buffer
 
-    # Send the PDF to be previewed in the browser
-    return send_file(pdf_buffer, as_attachment=True, download_name='form_preview.pdf', mimetype='application/pdf')
+#     # Send the PDF to be previewed in the browser
+#     return send_file(pdf_buffer, as_attachment=True, download_name='form_preview.pdf', mimetype='application/pdf')
 
-@app_form.route('/pdf_generator',methods=['GET'])
-def pdf_generator():
-    return render_template("pdf_generator.html")
+# @app_form.route('/pdf_generator',methods=['GET'])
+# def pdf_generator():
+#     return render_template("pdf_generator.html")
 
-# @app_form.route('/download_pdf',methods=['POST'])
-# def download_pdf():
-#     data_json=request.form.get('data')
-#     if not data_json:
-#         flash("No data provided to download", 400)
-#         return '', 400
+# # @app_form.route('/download_pdf',methods=['POST'])
+# # def download_pdf():
+# #     data_json=request.form.get('data')
+# #     if not data_json:
+# #         flash("No data provided to download", 400)
+# #         return '', 400
 
-#     try:
-#         data = json.loads(data_json)
-#     except (TypeError, json.JSONDecodeError) as e:
-#         flash(f"Invalid data format: {e}", 400)
-#         return '', 400
+# #     try:
+# #         data = json.loads(data_json)
+# #     except (TypeError, json.JSONDecodeError) as e:
+# #         flash(f"Invalid data format: {e}", 400)
+# #         return '', 400
 
-#     print(data)
-#     # generate pdf
-#     pdf_buffer=generate_pdf(data)
+# #     print(data)
+# #     # generate pdf
+# #     pdf_buffer=generate_pdf(data)
 
-#     return send_file(pdf_buffer,as_attachment=True,download_name='NCET_PG_Application_form.pdf',mimetype='application/pdf')
+# #     return send_file(pdf_buffer,as_attachment=True,download_name='NCET_PG_Application_form.pdf',mimetype='application/pdf')
 
     
-@app_form.route('/preview', methods=['POST'])
-def preview():
-    application_number = request.form.get('application_number')
-    return render_template('preview.html', application_number=application_number)
 
 
-# @app_form.route('/section1', methods=['GET', 'POST'])
-# def section1():
-#     if request.method == 'POST':
-#         # Process the form data for Section 1
-#         # ...
-
-#         # Update completion status
-#         session['completed_steps'] = [1]  # Mark section 1 as completed
-#         return redirect(url_for('auth.home'))
-
-#     return render_template('section1.html')
-
-# @app_form.route('/section2', methods=['GET', 'POST'])
-# def section2():
-#     # Ensure Section 1 is completed before proceeding
-#     if 1 not in session.get('completed_steps', []):
-#         return redirect(url_for('home'))
-
-#     if request.method == 'POST':
-#         # Process the form data for Section 2
-#         # ...
-
-#         # Update completion status
-#         session['completed_steps'].append(2)  # Mark section 2 as completed
-#         return redirect(url_for('auth.home'))
-
-#     return render_template('section2.html')
 

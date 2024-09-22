@@ -103,6 +103,7 @@
         // Check if required fields are filled
         if (nameField !== "") {
             submitButton.disabled = false;
+            flash("Please enter the details in all the required fields.", "error")
             warningMessage.style.display = "none"; // Hide warning if valid
         } else {
             submitButton.disabled = true;

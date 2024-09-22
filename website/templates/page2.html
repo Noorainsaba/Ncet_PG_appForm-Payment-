@@ -15,9 +15,10 @@
         <h3>School of Management</h3>
     </div>
     <div class="upload-container">
-        <input type="file" name="profile_picture" accept="image/*" onchange="previewImage(event)">
-        <div id="imagePreview" style="background-image: url('');">
+        <div id="imagePreview" onclick="document.getElementById('fileInput').click();">
+            <span>Upload Your Picture Here</span>
         </div>
+        <input type="file" id="fileInput" name="profile_picture" accept="image/*" style="display: none;" onchange="previewImage(event)">
     </div>
 </div>
 
@@ -92,7 +93,7 @@
     <div class="form-group">
         <label>Name:</label>
         <div class="inline-group">
-            <input type="text" name="first_name" placeholder="First Name" required>
+            <input type="text" name="first_name" placeholder="First Name">
             <input type="text" name="middle_name" placeholder="Middle Name">
             <input type="text" name="surname" placeholder="Surname">
         </div>
@@ -197,57 +198,74 @@
 
     <!-- Address for Correspondence -->
     <div class="section-header">Address for Correspondence</div>
-    <div class="form-group">
-        <label>City:</label>
-        <input type="text" name="correspondence_city">
-    </div>
-    <div class="form-group">
-        <label>Pincode:</label>
-        <input type="text" name="correspondence_pincode">
-    </div>
-    <div class="form-group">
-        <label>State:</label>
-        <input type="text" name="correspondence_state">
-    </div>
-    <div class="form-group">
-        <label>Country:</label>
-        <input type="text" name="correspondence_country">
-    </div>
-    <div class="form-group">
-        <label>Contact No (Tel):</label>
-        <input type="tel" name="correspondence_tel">
-    </div>
-    <div class="form-group">
-        <label>Mobile:</label>
-        <input type="tel" name="correspondence_mobile">
+    <div class="form-group inline-group">
+        <div>
+            <label>City:</label>
+            <input type="text" name="correspondence_city">
+        </div>
+        <div>
+            <label>Pincode:</label>
+            <input type="text" name="correspondence_pincode">
+        </div>
     </div>
 
-    <!-- Permanent Address -->
-    <div class="section-header">Permanent Address</div>
-    <div class="form-group">
+    <div class="form-group inline-group">
+        <div>
+            <label>State:</label>
+            <input type="text" name="correspondence_state">
+        </div>
+        <div>
+            <label>Country:</label>
+            <input type="text" name="correspondence_country">
+        </div>
+    </div>
+
+    <div class="form-group inline-group">
+        <div>
+            <label>Contact No (Tel):</label>
+            <input type="tel" name="correspondence_tel" placeholder="Optional">
+        </div>
+        <div>
+            <label>Mobile:</label>
+            <input type="tel" name="correspondence_mobile">
+        </div>
+    </div>
+
+<!-- Change correspondence fields to permanent fields -->
+<div class="section-header">Permanent Address</div>
+<div class="form-group inline-group">
+    <div>
         <label>City:</label>
-        <input type="text" name="permanent_city">
+        <input type="text" name="permanent_city"> <!-- Change this -->
     </div>
-    <div class="form-group">
+    <div>
         <label>Pincode:</label>
-        <input type="text" name="permanent_pincode">
+        <input type="text" name="permanent_pincode"> <!-- Change this -->
     </div>
-    <div class="form-group">
+</div>
+
+<div class="form-group inline-group">
+    <div>
         <label>State:</label>
-        <input type="text" name="permanent_state">
+        <input type="text" name="permanent_state"> <!-- Change this -->
     </div>
-    <div class="form-group">
+    <div>
         <label>Country:</label>
-        <input type="text" name="permanent_country">
+        <input type="text" name="permanent_country"> <!-- Change this -->
     </div>
-    <div class="form-group">
+</div>
+
+<div class="form-group inline-group">
+    <div>
         <label>Contact No (Tel):</label>
-        <input type="tel" name="permanent_tel">
+        <input type="tel" name="permanent_tel" placeholder="Optional"> <!-- Change this -->
     </div>
-    <div class="form-group">
+    <div>
         <label>Mobile:</label>
-        <input type="tel" name="permanent_mobile">
+        <input type="tel" name="permanent_mobile"> <!-- Change this -->
     </div>
+</div>
+
 
     <!-- Additional Details -->
     <div class="form-group">
@@ -258,24 +276,26 @@
     <div class="form-group">
         <label>Do you have a passport?</label>
         <div class="radio-group">
-            <input type="radio" name="passport" value="yes"> Yes
-            <input type="radio" name="passport" value="no"> No
+            <input type="radio" name="passport" value="yes" id="passport_yes" onclick="togglePassportFields()" required> Yes
+            <input type="radio" name="passport" value="no" id="passport_no" onclick="togglePassportFields()"> No
         </div>
     </div>
-
-    <div class="form-group">
+    
+    <div class="form-group" id="passport_details" style="display: none;">
         <label>Passport No:</label>
-        <input type="text" name="passport_no">
+        <input type="text" name="passport_no" placeholder="Enter Passport No">
     </div>
-    <div class="form-group">
+    
+    <div class="form-group" id="passport_expiry_group" style="display: none;">
         <label>Year of Expiry:</label>
-        <input type="text" name="passport_expiry">
+        <input type="text" name="passport_expiry" placeholder="Enter Year of Expiry">
     </div>
-    <div class="form-group">
+    
+    <div class="form-group" id="passport_issued_on_group" style="display: none;">
         <label>Issued on:</label>
         <input type="date" name="passport_issued_on">
     </div>
-
+    
     <div class="form-group">
         <button type="submit" name="save" onclick="showConfirmationPopup(event)">Save and Proceed</button>
     </div>
@@ -310,29 +330,56 @@ function saveAndProceed(){
 </script>
 
 <script>
+        function previewImage(event) {
+            const file = event.target.files[0];
+            const imagePreview = document.getElementById('imagePreview');
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                imagePreview.style.backgroundImage = `url(${e.target.result})`;
+                imagePreview.style.backgroundSize = 'cover';
+                imagePreview.style.backgroundPosition = 'center';
+                imagePreview.innerHTML = ''; // Clear the text
+            };
+            // reader.readAsDataURL(file);
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        
+
+        function togglePassportFields() {
+        const passportYes = document.getElementById('passport_yes').checked;
+        const passportDetails = document.getElementById('passport_details');
+        const passportExpiryGroup = document.getElementById('passport_expiry_group');
+        const passportIssuedOnGroup = document.getElementById('passport_issued_on_group');
+
+        if (passportYes) {
+            passportDetails.style.display = 'block';
+            passportExpiryGroup.style.display = 'block';
+            passportIssuedOnGroup.style.display = 'block';
+
+            // Add required attributes to passport fields
+            document.querySelector('input[name="passport_no"]').setAttribute('required', 'required');
+            document.querySelector('input[name="passport_expiry"]').setAttribute('required', 'required');
+            document.querySelector('input[name="passport_issued_on"]').setAttribute('required', 'required');
+        } else {
+            passportDetails.style.display = 'none';
+            passportExpiryGroup.style.display = 'none';
+            passportIssuedOnGroup.style.display = 'none';
+
+            // Remove required attributes from passport fields
+            document.querySelector('input[name="passport_no"]').removeAttribute('required');
+            document.querySelector('input[name="passport_expiry"]').removeAttribute('required');
+            document.querySelector('input[name="passport_issued_on"]').removeAttribute('required');
+        }
+    }
+
     document.querySelectorAll('input[name="work_experience"]').forEach(function(el) {
         el.addEventListener('change', function() {
             document.getElementById('work_experience_details').style.display = this.value === 'Yes' ? 'block' : 'none';
         });
     });
 </script>
-<!-- <script>
-    function previewImage(event) {
-        const imagePreview = document.getElementById('imagePreview');
-        const file = event.target.files[0];
-        const reader = new FileReader();
-
-        reader.onload = function() {
-            if (reader.readyState === 2) {
-                imagePreview.style.backgroundImage = url(${reader.result});
-            }
-        }
-
-        if (file) {
-            reader.readAsDataURL(file);
-        }
-    }
-</script> -->
 {% endblock %}
-
-

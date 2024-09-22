@@ -12,6 +12,7 @@ temp_users_collection=db["temp_users"]
 page1_collection=db["page1_collection"]
 page2_collection = db["page2_collection"] 
 page3_collection=db["page3_collection"]
+page4_collection=db["page4_collection"]
 
 counters_collection=db['counters']
 def initialize_app_number_counter():
