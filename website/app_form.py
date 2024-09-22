@@ -1,4 +1,5 @@
-from flask import Blueprint,render_template,request,redirect,url_for,session,flash
+from flask import Blueprint,render_template,request,redirect,url_for,session,flash,make_response
+from xhtml2pdf import pisa
 from pymongo import MongoClient
 # from pymongo.errors import ConnectionError
 from .db import page2_collection,page1_collection,page3_collection,page4_collection
@@ -46,10 +47,33 @@ def page1():
         form_data = {
             "application_number": session.get('application_number'),
             "candidate_name": candidate_name,
-            "documents": documents,
-            "other_documents": other_documents
+            "other_documents": other_documents,
+            "document_status": {
+                doc: ("Yes" if doc in documents else "No") for doc in [
+                    'Photos',
+                    'Aadhar Card',
+                    'Marks Cards',
+                    'Diploma/Graduation',
+                    'Entrance Test Score',
+                    'Work Experience',
+                    'Other',
+                    'Transfer Certificate',
+                    'Migration Certificate',
+                    'Conduct/Study Certificate',
+                    'Caste Certificate',
+                    'Income Certificate',
+                    'Passport/Visa Copy',
+                    'Rank/Score Card',
+                    '3 Passport and 3 Stamp size photos',
+                    'Copy of Aadhar card',
+                    '10th/SSLC and 10+2/PUC marks cards',
+                    'Diploma/Graduation marks cards and Certificate',
+                    'Entrance test score card, if any',
+                    'Work Experience Letter, if any',
+                    'Any other Certificates, Specify:'
+                ]
+            }
         }
-
         try:
             page1_collection.update_one(
                 {"application_number":application_number},
@@ -187,26 +211,26 @@ def page2():
             "passport_issued_on": passport_issued_on
         }
    
-        required_fields = [
-            "pgcet_no", "admission_order_no", "rank", 
-            "claimed_category", "allocated_category", "locality", 
-            "first_name", "surname", "dob", "gender", "nationality", 
-            "religion", "blood_group", "physically_challenged", 
-            "category", "aadhaar_no", "father_name", "mother_name", 
-            "father_occupation", "mother_occupation", "father_phone", 
-            "mother_phone", "correspondence_city", "correspondence_pincode", 
-            "correspondence_state", "correspondence_country", 
-            "correspondence_mobile", "permanent_city", "permanent_pincode", 
-            "permanent_state", "permanent_country", "permanent_mobile", 
-            "preferred_contact_time", "passport"
-        ]
+        # required_fields = [
+        #     "pgcet_no", "admission_order_no", "rank", 
+        #     "claimed_category", "allocated_category", "locality", 
+        #     "first_name", "surname", "dob", "gender", "nationality", 
+        #     "religion", "blood_group", "physically_challenged", 
+        #     "category", "aadhaar_no", "father_name", "mother_name", 
+        #     "father_occupation", "mother_occupation", "father_phone", 
+        #     "mother_phone", "correspondence_city", "correspondence_pincode", 
+        #     "correspondence_state", "correspondence_country", 
+        #     "correspondence_mobile", "permanent_city", "permanent_pincode", 
+        #     "permanent_state", "permanent_country", "permanent_mobile", 
+        #     "preferred_contact_time", "passport"
+        # ]
 
-        if request.form.get("passport") == "yes":
-            required_fields += ["passport_no", "passport_expiry", "passport_issued_on"]
+        # if request.form.get("passport") == "yes":
+        #     required_fields += ["passport_no", "passport_expiry", "passport_issued_on"]
 
-        if any(form_data[field] == "" for field in required_fields):
-            flash("Please enter the details in all the required fields.", "error")
-            return render_template('page2.html', form_data=form_data)
+        # if any(form_data[field] == "" for field in required_fields):
+        #     flash("Please enter the details in all the required fields.", "error")
+        #     return render_template('page2.html', form_data=form_data)
         
         try:
             page2_collection.update_one(
@@ -415,67 +439,97 @@ def preview():
 
 @app_form.route('/download_pdf', methods=['POST'])
 def download_pdf():
-    application_number = request.form.get('application_number')
+    # Get application number from form submission
+    application_number = request.form.get("application_number")
     
-    # Fetch data and generate PDF as shown in your previous code
+    # Fetch the form data for the given application number
     page1_data = page1_collection.find_one({'application_number': application_number})
     page2_data = page2_collection.find_one({'application_number': application_number})
     page3_data = page3_collection.find_one({'application_number': application_number})
 
+    # Combine the data into a dictionary
     entire_form_data = {
         'page1_data': page1_data,
         'page2_data': page2_data,
         'page3_data': page3_data
     }
+
+    # Render the HTML content for the PDF
+    rendered_html = render_template('preview.html', data=entire_form_data)
+
+    # Inject custom CSS for PDF rendering
+    pdf_css_url = url_for('static', filename='css/pdf_styles.css')
+
+    rendered_html = f"""
+    <html>
+    <head>
+        <link rel="stylesheet" href="{pdf_css_url}">
+    </head>
+    <body>
+        {rendered_html}
+    </body>
+    </html>
+    """
+
+    # Create a BytesIO stream to hold the PDF data
+    pdf_stream = io.BytesIO()
+
+    # Convert the rendered HTML to PDF
+    pisa_status = pisa.CreatePDF(io.StringIO(rendered_html), dest=pdf_stream)
+
+    # Check for PDF generation errors
+    if pisa_status.err:
+        return "Error creating PDF", 500
+
+    # Rewind the BytesIO stream
+    pdf_stream.seek(0)
+
+    # Create a response object and set the appropriate headers for PDF download
+    response = make_response(pdf_stream.read())
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = f'attachment; filename=Application_{application_number}.pdf'
+
+    return response
+
+
+# @app_form.route('/download_pdf', methods=['POST'])
+# def download_pdf():
+#     application_number = request.form.get('application_number')
     
-    entire_form_data = convert_objectid_to_str(entire_form_data)
+#     # Fetch data and generate PDF as shown in your previous code
+#     page1_data = page1_collection.find_one({'application_number': application_number})
+#     page2_data = page2_collection.find_one({'application_number': application_number})
+#     page3_data = page3_collection.find_one({'application_number': application_number})
 
-    # Create a PDF
-    pdf_buffer = io.BytesIO()
-    pdf = canvas.Canvas(pdf_buffer, pagesize=letter)
-    pdf.setTitle('Form Preview')
+#     entire_form_data = {
+#         'page1_data': page1_data,
+#         'page2_data': page2_data,
+#         'page3_data': page3_data
+#     }
+    
+#     entire_form_data = convert_objectid_to_str(entire_form_data)
 
-    for page, data in entire_form_data.items():
-        text = pdf.beginText(40, 750)  # Start position (x, y)
-        text.setFont("Helvetica", 12)
-        text.textLine(f"{page.capitalize()}:")
-        
-        for key, value in data.items():
-            text.textLine(f"{key}: {value}")
-        
-        pdf.drawText(text)
-        pdf.showPage()  # Move to the next page after each section
-
-    pdf.save()
-    pdf_buffer.seek(0)
-
-    return send_file(pdf_buffer, as_attachment=True, download_name='NCET-PG Application.pdf')
-
-
-
-# def generate_pdf(data):
-#     # Create a byte stream buffer to hold the PDF data
+#     # Create a PDF
 #     pdf_buffer = io.BytesIO()
-
-#     # Create a PDF canvas
 #     pdf = canvas.Canvas(pdf_buffer, pagesize=letter)
-#     pdf.setTitle('Application Data PDF')
+#     pdf.setTitle('Form Preview')
 
-#     # Add data to the PDF
-#     pdf.drawString(100, 750, 'Application Data Summary:')
-    
-#     y_position = 720
-#     for collection_name, collection_data in data.items():
-#         pdf.drawString(100, y_position, f'{collection_name}: {str(collection_data)}')
-#         y_position -= 20  # Move down for the next line
+#     for page, data in entire_form_data.items():
+#         text = pdf.beginText(40, 750)  # Start position (x, y)
+#         text.setFont("Helvetica", 12)
+#         text.textLine(f"{page.capitalize()}:")
+        
+#         for key, value in data.items():
+#             text.textLine(f"{key}: {value}")
+        
+#         pdf.drawText(text)
+#         pdf.showPage()  # Move to the next page after each section
 
-#     # Save the PDF
 #     pdf.save()
-
-#     # Move the buffer cursor to the beginning
 #     pdf_buffer.seek(0)
 
-#     return pdf_buffer
+#     return send_file(pdf_buffer, as_attachment=True, download_name='NCET-PG Application.pdf')
+
 
 def convert_objectid_to_str(data):
     if isinstance(data, list):
@@ -486,71 +540,4 @@ def convert_objectid_to_str(data):
         return str(data)
     else:
         return data
-
-# @app_form.route('/fetch_data',methods=['POST'])
-# def fetch_data():
-#     application_number=request.form.get('application_number')
-
-#     page1_data=page1_collection.find_one({'application_number':application_number})
-#     page2_data=page2_collection.find_one({'application_number':application_number})
-#     page3_data=page3_collection.find_one({'application_number':application_number})
-
-#     entireForm_data={
-#         'page1_data':page1_data,
-#         'page2_data':page2_data,
-#         'page3_data':page3_data
-#     }
-
-#     entireForm_data = convert_objectid_to_str(entireForm_data)
-
-#     # Create a PDF
-#     pdf_buffer = io.BytesIO()
-#     pdf = canvas.Canvas(pdf_buffer, pagesize=letter)
-#     pdf.setTitle('Form Preview')
-
-#     # Add content to the PDF
-#     text = pdf.beginText(40, 750)  # Start position (x, y)
-#     text.setFont("Helvetica", 12)
-
-#     for page, data in entireForm_data.items():
-#         text.textLine(f"{page.capitalize()}:")
-#         for key, value in data.items():
-#             text.textLine(f"{key}: {value}")
-#         text.textLine(" ")
-
-#     pdf.drawText(text)
-#     pdf.showPage()
-#     pdf.save()
-
-#     pdf_buffer.seek(0)  # Move to the beginning of the BytesIO buffer
-
-#     # Send the PDF to be previewed in the browser
-#     return send_file(pdf_buffer, as_attachment=True, download_name='form_preview.pdf', mimetype='application/pdf')
-
-# @app_form.route('/pdf_generator',methods=['GET'])
-# def pdf_generator():
-#     return render_template("pdf_generator.html")
-
-# # @app_form.route('/download_pdf',methods=['POST'])
-# # def download_pdf():
-# #     data_json=request.form.get('data')
-# #     if not data_json:
-# #         flash("No data provided to download", 400)
-# #         return '', 400
-
-# #     try:
-# #         data = json.loads(data_json)
-# #     except (TypeError, json.JSONDecodeError) as e:
-# #         flash(f"Invalid data format: {e}", 400)
-# #         return '', 400
-
-# #     print(data)
-# #     # generate pdf
-# #     pdf_buffer=generate_pdf(data)
-
-# #     return send_file(pdf_buffer,as_attachment=True,download_name='NCET_PG_Application_form.pdf',mimetype='application/pdf')
-
-    
-
-
 

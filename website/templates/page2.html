@@ -2,384 +2,363 @@
 
 {% block title %}Page2{% endblock %}
 {% block extra_css %}
-<link rel="stylesheet" href="{{url_for('static', filename='css/page2.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/page2.css') }}">
 {% endblock %}
 {% block content %}
 <div class="container" id="contentContainer">
-<div class="header-container">
-    <div class="logo">
-        <img src="Logo.jpg" alt="" style="width: 150px; height: auto;">
-    </div>
-    <div class="title">
-        <h2>Nagarjuna Degree College</h2>
-        <h3>School of Management</h3>
-    </div>
-    <div class="upload-container">
-        <div id="imagePreview" onclick="document.getElementById('fileInput').click();">
-            <span>Upload Your Picture Here</span>
+    <div class="header-container">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                <ul>
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        <div class="logo">
+            <img src="Logo.jpg" alt="" style="width: 150px; height: auto;">
         </div>
-        <input type="file" id="fileInput" name="profile_picture" accept="image/*" style="display: none;" onchange="previewImage(event)">
+        <div class="title">
+            <h2>Nagarjuna Degree College</h2>
+            <h3>School of Management</h3>
+        </div>
+        <div class="upload-container">
+            <div id="imagePreview" onclick="document.getElementById('fileInput').click();">
+                <span>Upload Your Picture Here</span>
+            </div>
+            <input type="file" id="fileInput" name="profile_picture" accept="image/*" style="display: none;" onchange="previewImage(event)">
+        </div>
     </div>
-</div>
 
-<form id="myForm" action="{{url_for('app_form.page2')}}" method="POST" enctype="multipart/form-data">
-    <!-- Admission Type -->
-    <div class="form-group">
-        <label>Admission Type:<span class="required-star">*</span></label>
-        <div class="radio-group">
-            <input type="radio" name="admission_type" value="pgcet_quota" id="pgcet_quota" checked onclick="toggleDetails()"> PGCET QUOTA
-            <input type="radio" name="admission_type" value="management_quota" id="management_quota" onclick="toggleDetails()"> MANAGEMENT QUOTA
-        </div>
-    </div>
-    
-    <!-- PGCET No, Admission Order No, Rank (all in one line) -->
-    <div class="form-group inline-group" id="pgcet-details">
-        <div>
-            <label for="pgcet_no">PGCET No:<span class="required-star">*</span></label>
-            <input type="text" id="pgcet_no" name="pgcet_no">
-        </div>
-        <div>
-            <label for="admission_order_no">Admission Order No:<span class="required-star">*</span></label>
-            <input type="text" id="admission_order_no" name="admission_order_no">
-        </div>
-        <div>
-            <label for="rank">Rank:<span class="required-star">*</span></label>
-            <input type="text" id="rank" name="rank">
-        </div>
-    </div>
-    
-    <!-- Claimed Category, Allocated Category, Locality (all in one line) -->
-    <div class="form-group inline-group" id="category-details">
-        <div>
-            <label>Claimed Category:<span class="required-star">*</span></label>
-            <input type="text" name="claimed_category">
-        </div>
-        <div>
-            <label>Allocated Category:<span class="required-star">*</span></label>
-            <input type="text" name="allocated_category">
-        </div>
-        <div>
-            <label>Locality:<span class="required-star">*</span></label>
+    <form id="myForm" action="{{ url_for('app_form.page2') }}" method="POST" enctype="multipart/form-data"  onsubmit="return validateForm()">
+        <!-- Admission Type -->
+        <div class="form-group">
+            <label>Admission Type:<span class="required-star">*</span></label>
             <div class="radio-group">
-                <input type="radio" name="locality" value="kar"> Kar
-                <input type="radio" name="locality" value="non-kar"> Non-Kar
+                <input type="radio" name="admission_type" value="pgcet_quota" required> PGCET QUOTA
+                <input type="radio" name="admission_type" value="management_quota" required> MANAGEMENT QUOTA
             </div>
         </div>
-    </div>
-    
-    <script>
-        function toggleDetails() {
-            const managementQuotaSelected = document.getElementById('management_quota').checked;
-            const pgcetDetails = document.getElementById('pgcet-details');
-            const categoryDetails = document.getElementById('category-details');
-            
-            // Show or hide the details based on selected admission type
-            if (managementQuotaSelected) {
-                pgcetDetails.style.display = 'none';
-                categoryDetails.style.display = 'none'; // Hide category details
-            } else {
-                pgcetDetails.style.display = 'flex'; // or 'block' depending on your layout
-                categoryDetails.style.display = 'flex'; // or 'block'
-            }
-        }
-    
-        // Initial call to set the display based on default selection
-        toggleDetails();
-    </script>
-    
 
-    <!-- Personal Details -->
-    <div class="section-header">Personal Details (as per SSLC Certificate)</div>
-    <div class="form-group">
-        <label>Name:</label>
-        <div class="inline-group">
-            <input type="text" name="first_name" placeholder="First Name">
-            <input type="text" name="middle_name" placeholder="Middle Name">
-            <input type="text" name="surname" placeholder="Surname">
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label>Date of Birth:</label>
-        <input type="date" name="dob">
-    </div>
-
-    <div class="form-group inline-group">
-        <div>
-            <label>Gender:</label>
-            <div class="radio-group">
-                <input type="radio" name="gender" value="male"> Male
-                <input type="radio" name="gender" value="female"> Female
-                <input type="radio" name="gender" value="others"> Others
+        <!-- PGCET No, Admission Order No, Rank (all in one line) -->
+        <div class="form-group inline-group">
+            <div>
+                <label for="pgcet_no">PGCET No:<span class="required-star">*</span></label>
+                <input type="text" id="pgcet_no" name="pgcet_no" required pattern="^[A-Za-z0-9\s]+$" title="Only letters, numbers, and spaces are allowed.">
+            </div>
+            <div>
+                <label for="admission_order_no">Admission Order No: <span class="required-star">*</span></label>
+                <input type="text" id="admission_order_no" name="admission_order_no" required pattern="^[A-Za-z0-9\s]+$" title="Only letters, numbers, and spaces are allowed.">
+            </div>
+            <div>
+                <label for="rank">Rank: <span class="required-star">*</span></label>
+                <input type="text" id="rank" name="rank" required pattern="^[A-Za-z0-9\s]+$" title="Only letters, numbers, and spaces are allowed.">
             </div>
         </div>
-    </div>
 
-    <div class="form-group inline-group">
-        <div>
-            <label>Nationality:</label>
-            <div class="radio-group">
-                <input type="radio" name="nationality" value="indian"> Indian
-                <input type="radio" name="nationality" value="nri"> NRI
-                <input type="radio" name="nationality" value="foreign"> Foreign Citizen
+        <!-- Claimed Category, Allocated Category, Locality (all in one line) -->
+        <div class="form-group inline-group">
+            <div>
+                <label>Claimed Category: <span class="required-star">*</span></label>
+                <input type="text" name="claimed_category" required pattern="^[A-Za-z0-9\s]+$" title="Only letters, numbers, and spaces are allowed.">
+            </div>
+            <div>
+                <label>Allocated Category: <span class="required-star">*</span></label>
+                <input type="text" name="allocated_category" required pattern="^[A-Za-z0-9\s]+$" title="Only letters, numbers, and spaces are allowed.">
+            </div>
+            <div>
+                <label>Locality: <span class="required-star">*</span></label>
+                <div class="radio-group">
+                    <input type="radio" name="locality" value="kar" required> Kar
+                    <input type="radio" name="locality" value="non-kar" required> Non-Kar
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <label>Religion:</label>
-        <input type="text" name="religion">
-    </div>
+        <!-- Personal Details -->
+        <div class="section-header">Personal Details (as per SSLC Certificate)</div>
+        <div class="form-group">
+            <label>Name: <span class="required-star">*</span></label>
+            <div class="inline-group">
+                <input type="text" name="first_name" placeholder="First Name" required pattern="^[A-Za-z\s]+$" title="Only letters and spaces are allowed.">
+                <input type="text" name="middle_name" placeholder="Middle Name" required pattern="^[A-Za-z\s]+$" title="Only letters and spaces are allowed.">
+                <input type="text" name="surname" placeholder="Surname" required pattern="^[A-Za-z\s]+$" title="Only letters and spaces are allowed.">
+            </div>
+        </div>
 
-    <div class="form-group">
-        <label>Blood Group:</label>
-        <input type="text" name="blood_group">
-    </div>
+        <div class="form-group">
+            <label>Date of Birth: <span class="required-star">*</span></label>
+            <input type="date" name="dob" required>
+        </div>
 
-    <div class="form-group">
-        <label>Physically Challenged:</label>
-        <div class="radio-group">
-            <input type="radio" name="physically_challenged" value="yes"> Yes
-            <input type="radio" name="physically_challenged" value="no"> No
+        <div class="form-group inline-group">
+            <div>
+                <label>Gender: <span class="required-star">*</span></label>
+                <div class="radio-group">
+                    <input type="radio" name="gender" value="male" required> Male
+                    <input type="radio" name="gender" value="female" required> Female
+                    <input type="radio" name="gender" value="others" required> Others
+                </div>
+            </div>
         </div>
-    </div>
 
-    <!-- Category -->
-    <div class="form-group">
-        <label>Category:</label>
-        <div class="radio-group">
-            <input type="radio" name="category" value="general"> General
-            <input type="radio" name="category" value="obc"> OBC
-            <input type="radio" name="category" value="sc"> SC
-            <input type="radio" name="category" value="st"> ST
-            <input type="text" name="st_specify" placeholder="ST (Specify)">
+        <div class="form-group inline-group">
+            <div>
+                <label>Nationality: <span class="required-star">*</span></label>
+                <div class="radio-group">
+                    <input type="radio" name="nationality" value="indian" required> Indian
+                    <input type="radio" name="nationality" value="nri" required> NRI
+                    <input type="radio" name="nationality" value="foreign" required> Foreign Citizen
+                </div>
+            </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <label>Aadhaar Card No:</label>
-        <input type="text" name="aadhaar_no">
-    </div>
+        <div class="form-group">
+            <label>Religion: <span class="required-star">*</span></label>
+            <input type="text" name="religion" required pattern="^[A-Za-z\s]+$" title="Only letters and spaces are allowed.">
+        </div>
 
-    <!-- Parent's Details -->
-    <div class="section-header">Parent's Details</div>
-    <div class="form-group horizontal-group">
-        <div>
-            <label>Father's Name:</label>
-            <input type="text" name="father_name">
+        <div class="form-group">
+            <label>Blood Group: <span class="required-star">*</span></label>
+            <input type="text" name="blood_group" required pattern="^[A-Za-z\+\-]+$" title="Only letters and + or - are allowed.">
         </div>
-        <div>
-            <label>Mother's Name:</label>
-            <input type="text" name="mother_name">
-        </div>
-    </div>
 
-    <div class="form-group horizontal-group">
-        <div>
-            <label>Father's Occupation:</label>
-            <input type="text" name="father_occupation">
+        <div class="form-group">
+            <label>Physically Challenged: <span class="required-star">*</span></label>
+            <div class="radio-group">
+                <input type="radio" name="physically_challenged" value="yes" required> Yes
+                <input type="radio" name="physically_challenged" value="no" required> No
+            </div>
         </div>
-        <div>
-            <label>Mother's Occupation:</label>
-            <input type="text" name="mother_occupation">
-        </div>
-    </div>
 
-    <div class="form-group horizontal-group">
-        <div>
-            <label>Father's Phone Number:</label>
-            <input type="tel" name="father_phone">
+        <div class="form-group">
+            <label>Category: <span class="required-star">*</span></label>
+            <div class="radio-group">
+                <input type="radio" name="category" value="general" required> General
+                <input type="radio" name="category" value="obc" required> OBC
+                <input type="radio" name="category" value="sc" required> SC
+                <input type="radio" name="category" value="st" required> ST
+                <input type="text" name="st_specify" placeholder="ST (Specify)" pattern="^[A-Za-z\s]+$" title="Only letters and spaces are allowed.">
+            </div>
         </div>
-        <div>
-            <label>Mother's Phone Number:</label>
-            <input type="tel" name="mother_phone">
-        </div>
-    </div>
 
-    <!-- Address for Correspondence -->
-    <div class="section-header">Address for Correspondence</div>
-    <div class="form-group inline-group">
-        <div>
-            <label>City:</label>
-            <input type="text" name="correspondence_city">
+        <div class="form-group">
+            <label>Aadhaar Card No: <span class="required">*</span></label>
+            <input type="text" name="aadhaar_no" required pattern="^\d{12}$" title="Aadhaar number must be 12 digits.">
         </div>
-        <div>
-            <label>Pincode:</label>
-            <input type="text" name="correspondence_pincode">
-        </div>
-    </div>
 
-    <div class="form-group inline-group">
-        <div>
-            <label>State:</label>
-            <input type="text" name="correspondence_state">
-        </div>
-        <div>
-            <label>Country:</label>
-            <input type="text" name="correspondence_country">
-        </div>
-    </div>
 
-    <div class="form-group inline-group">
-        <div>
-            <label>Contact No (Tel):</label>
-            <input type="tel" name="correspondence_tel" placeholder="Optional">
+        <!-- Parent's Details -->
+        <div class="section-header">Parent's Details</div>
+        <div class="form-group horizontal-group">
+            <div>
+                <label>Father's Name: <span class="required-star">*</span></label>
+                <input type="text" name="father_name" required pattern="^[A-Za-z\s]+$" title="Only letters and spaces are allowed.">
+            </div>
+            <div>
+                <label>Mother's Name: <span class="required-star">*</span></label>
+                <input type="text" name="mother_name" required pattern="^[A-Za-z\s]+$" title="Only letters and spaces are allowed.">
+            </div>
         </div>
-        <div>
-            <label>Mobile:</label>
-            <input type="tel" name="correspondence_mobile">
-        </div>
-    </div>
 
-<!-- Change correspondence fields to permanent fields -->
-<div class="section-header">Permanent Address</div>
-<div class="form-group inline-group">
-    <div>
-        <label>City:</label>
-        <input type="text" name="permanent_city"> <!-- Change this -->
-    </div>
-    <div>
-        <label>Pincode:</label>
-        <input type="text" name="permanent_pincode"> <!-- Change this -->
-    </div>
+        <div class="form-group horizontal-group">
+            <div>
+                <label>Father's Occupation: <span class="required-star">*</span></label>
+                <input type="text" name="father_occupation" required pattern="^[A-Za-z\s]+$" title="Only letters and spaces are allowed.">
+            </div>
+            <div>
+                <label>Mother's Occupation: <span class="required-star">*</span></label>
+                <input type="text" name="mother_occupation" required pattern="^[A-Za-z\s]+$" title="Only letters and spaces are allowed.">
+            </div>
+        </div>
+
+        <div class="form-group horizontal-group">
+            <div>
+                <label>Father's Phone Number: <span class="required-star">*</span></label>
+                <input type="tel" name="father_phone" required pattern="^\d{10}$" title="Please enter a valid 10-digit phone number.">
+            </div>
+            <div>
+                <label>Mother's Phone Number: <span class="required-star">*</span></label>
+                <input type="tel" name="mother_phone" required pattern="^\d{10}$" title="Please enter a valid 10-digit phone number.">
+            </div>
+        </div>
+
+        <div class="section-header">Permanent Address</div>
+        <div class="form-group inline-group">
+            <div>
+                <label>City: <span class="required-star">*</span></label>
+                <input type="text" name="permanent_city" required pattern="^[A-Za-z\s]+$" title="Only letters and spaces are allowed.">
+            </div>
+            <div>
+                <label>Pincode: <span class="required-star">*</span></label>
+                <input type="text" name="permanent_pincode" required pattern="^\d{6}$" title="Pincode must be 6 digits.">
+            </div>
+        </div>
+
+        <div class="form-group inline-group">
+            <div>
+                <label>State: <span class="required-star">*</span></label>
+                <input type="text" name="permanent_state" required pattern="^[A-Za-z\s]+$" title="Only letters and spaces are allowed.">
+            </div>
+            <div>
+                <label>Country: <span class="required-star">*</span></label>
+                <input type="text" name="permanent_country" required pattern="^[A-Za-z\s]+$" title="Only letters and spaces are allowed.">
+            </div>
+        </div>
+
+        <div class="form-group inline-group">
+            <div>
+                <label>Contact No (Tel):</label>
+                <input type="tel" name="permanent_tel" placeholder="Optional" pattern="^\d{10}$" title="Please enter a valid 10-digit phone number.">
+            </div>
+            <div>
+                <label>Mobile: <span class="required-star">*</span></label>
+                <input type="tel" name="permanent_mobile" required pattern="^\d{10}$" title="Please enter a valid 10-digit phone number.">
+            </div>
+        </div>
+
+        <!-- Additional Details -->
+        <div class="form-group">
+            <label>Preferred Contact Time: <span class="required-star">*</span></label>
+            <input type="text" name="preferred_contact_time" required>
+        </div>
+
+        <div class="form-group">
+            <label>Do you have a passport? <span class="required-star">*</span></label>
+            <div class="radio-group">
+                <input type="radio" name="passport" value="yes" id="passport_yes" onclick="togglePassportFields()" required> Yes
+                <input type="radio" name="passport" value="no" id="passport_no" onclick="togglePassportFields()"> No
+            </div>
+        </div>
+        
+        <div class="form-group" id="passport_details" style="display: none;">
+            <label>Passport No: </label>
+            <input type="text" name="passport_no" placeholder="Enter Passport No" required>
+        </div>
+        
+        <div class="form-group" id="passport_expiry_group" style="display: none;">
+            <label>Year of Expiry:<span class="required-star">*</span> </label>
+            <input type="text" name="passport_expiry" placeholder="Enter Year of Expiry" required pattern="^\d{4}$" title="Year must be in YYYY format.">
+        </div>
+        
+        <div class="form-group" id="passport_issued_on_group" style="display: none;">
+            <label>Issued on: <span class="required-star">*</span></label>
+            <input type="date" name="passport_issued_on" required>
+        </div>
+        
+        <div class="form-group">
+            <button type="submit" name="save" onclick="showConfirmationPopup(event)">Save and Proceed</button>
+        </div>
+    </form>
 </div>
 
-<div class="form-group inline-group">
-    <div>
-        <label>State:</label>
-        <input type="text" name="permanent_state"> <!-- Change this -->
-    </div>
-    <div>
-        <label>Country:</label>
-        <input type="text" name="permanent_country"> <!-- Change this -->
-    </div>
-</div>
-
-<div class="form-group inline-group">
-    <div>
-        <label>Contact No (Tel):</label>
-        <input type="tel" name="permanent_tel" placeholder="Optional"> <!-- Change this -->
-    </div>
-    <div>
-        <label>Mobile:</label>
-        <input type="tel" name="permanent_mobile"> <!-- Change this -->
-    </div>
-</div>
-
-
-    <!-- Additional Details -->
-    <div class="form-group">
-        <label>Preferred Contact Time:</label>
-        <input type="text" name="preferred_contact_time">
-    </div>
-
-    <div class="form-group">
-        <label>Do you have a passport?</label>
-        <div class="radio-group">
-            <input type="radio" name="passport" value="yes" id="passport_yes" onclick="togglePassportFields()" required> Yes
-            <input type="radio" name="passport" value="no" id="passport_no" onclick="togglePassportFields()"> No
-        </div>
-    </div>
-    
-    <div class="form-group" id="passport_details" style="display: none;">
-        <label>Passport No:</label>
-        <input type="text" name="passport_no" placeholder="Enter Passport No">
-    </div>
-    
-    <div class="form-group" id="passport_expiry_group" style="display: none;">
-        <label>Year of Expiry:</label>
-        <input type="text" name="passport_expiry" placeholder="Enter Year of Expiry">
-    </div>
-    
-    <div class="form-group" id="passport_issued_on_group" style="display: none;">
-        <label>Issued on:</label>
-        <input type="date" name="passport_issued_on">
-    </div>
-    
-    <div class="form-group">
-        <button type="submit" name="save" onclick="showConfirmationPopup(event)">Save and Proceed</button>
-    </div>
-</form>
-</div>
 <div id="confirmationPopup" style="display:none; position:fixed; top: 50%; transform: translate(50%,-50%); background:white; padding:20px; border:10px solid #ccc;">
     <p>Once clicked on save, you won't be able to modify the details.Are you sure?</p>
     <button onclick="closePopup()">Back</button>
     <button onclick="saveAndProceed()">Save</button>
 </div>
 
+
 <div id="overlay" class="overlay" style="display:none;"></div>
-<script>
-function showConfirmationPopup(event){
-    event.preventDefault();
-    const overlay = document.querySelector('.overlay');
-    overlay.style.display = 'flex';
-    document.getElementById("confirmationPopup").style.display="block";
-    document.getElementById("overlay").style.display="block";
-    document.getElementById('contentContainer').classList.add('blur');
-}
-
-function closePopup(){
-    document.getElementById("confirmationPopup").style.display="none";
-    document.getElementById("overlay").style.display="none";
-    document.getElementById('contentContainer').classList.remove('blur');
-}
-
-function saveAndProceed(){
-    document.getElementById("myForm").submit();
-}
-</script>
 
 <script>
-        function previewImage(event) {
-            const file = event.target.files[0];
-            const imagePreview = document.getElementById('imagePreview');
-            const reader = new FileReader();
 
-            reader.onload = function(e) {
-                imagePreview.style.backgroundImage = `url(${e.target.result})`;
-                imagePreview.style.backgroundSize = 'cover';
-                imagePreview.style.backgroundPosition = 'center';
-                imagePreview.innerHTML = ''; // Clear the text
-            };
-            // reader.readAsDataURL(file);
-            if (file) {
-                reader.readAsDataURL(file);
+    function validateForm() {
+        const form = document.getElementById('myForm');
+        
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            // Let HTML5 handle the validation with built-in messages
+            return false;
+        }
+        
+        const requiredFields = [
+            'pgcet_no', 'admission_order_no', 'rank', 'claimed_category',
+            'allocated_category', 'locality', 'first_name', 'surname', 'dob',
+            'gender', 'nationality', 'religion', 'blood_group', 'physically_challenged',
+            'category', 'aadhaar_no', 'father_name', 'mother_name', 'father_occupation',
+            'mother_occupation', 'father_phone', 'mother_phone', 'correspondence_city',
+            'correspondence_pincode', 'correspondence_state', 'correspondence_country',
+            'correspondence_mobile', 'permanent_city', 'permanent_pincode', 'permanent_state',
+            'permanent_country', 'permanent_mobile', 'preferred_contact_time'
+        ];
+
+        let isValid = true;
+
+        requiredFields.forEach(field => {
+            const input = document.querySelector([name="${field}"]);
+            if (input && input.value.trim() === "") {
+                input.classList.add('invalid');
+                isValid = false;
+            } else if (input) {
+                input.classList.remove('invalid');
+            }
+        });
+
+        if (document.querySelector('input[name="passport"]:checked').value === 'yes') {
+            const passportFields = ['passport_no', 'passport_expiry', 'passport_issued_on'];
+            passportFields.forEach(field => {
+                const input = document.querySelector([name="${field}"]);
+                if (input && input.value.trim() === "") {
+                    input.classList.add('invalid');
+                    isValid = false;
+                } else if (input) {
+                    input.classList.remove('invalid');
+                }
+            });
+            if (!isValid) {
+            alert('Please fill all required fields.');
+            return false;
             }
         }
-        
-        
 
-        function togglePassportFields() {
-        const passportYes = document.getElementById('passport_yes').checked;
-        const passportDetails = document.getElementById('passport_details');
-        const passportExpiryGroup = document.getElementById('passport_expiry_group');
-        const passportIssuedOnGroup = document.getElementById('passport_issued_on_group');
-
-        if (passportYes) {
-            passportDetails.style.display = 'block';
-            passportExpiryGroup.style.display = 'block';
-            passportIssuedOnGroup.style.display = 'block';
-
-            // Add required attributes to passport fields
-            document.querySelector('input[name="passport_no"]').setAttribute('required', 'required');
-            document.querySelector('input[name="passport_expiry"]').setAttribute('required', 'required');
-            document.querySelector('input[name="passport_issued_on"]').setAttribute('required', 'required');
-        } else {
-            passportDetails.style.display = 'none';
-            passportExpiryGroup.style.display = 'none';
-            passportIssuedOnGroup.style.display = 'none';
-
-            // Remove required attributes from passport fields
-            document.querySelector('input[name="passport_no"]').removeAttribute('required');
-            document.querySelector('input[name="passport_expiry"]').removeAttribute('required');
-            document.querySelector('input[name="passport_issued_on"]').removeAttribute('required');
-        }
+        return true;
     }
 
-    document.querySelectorAll('input[name="work_experience"]').forEach(function(el) {
-        el.addEventListener('change', function() {
-            document.getElementById('work_experience_details').style.display = this.value === 'Yes' ? 'block' : 'none';
-        });
-    });
+    function showConfirmationPopup(event){
+        event.preventDefault();
+        const overlay = document.querySelector('.overlay');
+        overlay.style.display = 'flex';
+        document.getElementById("confirmationPopup").style.display = "block";
+        document.getElementById('contentContainer').classList.add('blur');
+    }
+
+    function closePopup(){
+        document.getElementById("confirmationPopup").style.display = "none";
+        document.getElementById('overlay').style.display = "none";
+        document.getElementById('contentContainer').classList.remove('blur');
+    }
+
+    function saveAndProceed(){
+        document.getElementById("myForm").submit();
+    }
+
+    function togglePassportFields() {
+        const passportDetails = document.getElementById("passport_details");
+        const passportExpiryGroup = document.getElementById("passport_expiry_group");
+        const passportIssuedOnGroup = document.getElementById("passport_issued_on_group");
+        const hasPassport = document.querySelector('input[name="passport"]:checked').value === "yes";
+        
+        passportDetails.style.display = hasPassport ? "block" : "none";
+        passportExpiryGroup.style.display = hasPassport ? "block" : "none";
+        passportIssuedOnGroup.style.display = hasPassport ? "block" : "none";
+    }
+
+    function previewImage(event) {
+        const imagePreview = document.getElementById('imagePreview');
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            imagePreview.style.backgroundImage = `url(${e.target.result})`;
+            imagePreview.style.backgroundSize = 'cover';
+            imagePreview.style.color = 'transparent'; // Hide the text
+        };
+        
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    }
 </script>
 {% endblock %}
