@@ -23,14 +23,14 @@
 </div>
 
 <form id="myForm" action="{{url_for('app_form.page2')}}" method="POST" enctype="multipart/form-data">
-    <!-- Admission Type -->
+    //Admission Type
     <div class="form-group">
         <label>Admission Type:<span class="required-star">*</span></label>
         <div class="radio-group">
             <input type="radio" name="admission_type" value="pgcet_quota" id="pgcet_quota" checked onclick="toggleDetails()"> PGCET QUOTA
             <input type="radio" name="admission_type" value="management_quota" id="management_quota" onclick="toggleDetails()"> MANAGEMENT QUOTA
         </div>
-    </div>
+    </div>!--  -->
     
     <!-- PGCET No, Admission Order No, Rank (all in one line) -->
     <div class="form-group inline-group" id="pgcet-details">
