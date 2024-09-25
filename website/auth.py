@@ -123,7 +123,7 @@ def confirm_resend_otp():
         session['otp_timestamp'] = current_time
         session['otp_resend_count'] = otp_resend_count + 1
 
-        msg = Message('Ncet PG Application form email verification', sender='ncet_aks1@outlook.com', recipients=[email])
+        msg = Message('Ncet PG Application form email verification', sender='afreen04.taj.s@gmail.com', recipients=[email])
         msg.body = f"Hi,\nYour new email OTP is: {otp}"
 
         try:
@@ -234,7 +234,7 @@ def verify_otp():
 
             flash('Email verified successfully and Application number is generated!Please sign in',category='success')
             try:
-                msg = Message('Application Number | NCET-PG Admissions Gateway', sender='ncet_aks1@outlook.com', recipients=[email])
+                msg = Message('Application Number | NCET-PG Admissions Gateway', sender='afreen04.taj.s@gmail.com', recipients=[email])
                 msg.body = f"Your Application number for NCET-PG Admissions Gateway is {app_number}."
                 mail.send(msg)
             except Exception as e:
@@ -284,7 +284,7 @@ def signup():
         # Message->class
 
         # subject
-        msg=Message('Ncet PG Application form email verification',sender='ncet_aks1@outlook.com',recipients=[email])
+        msg=Message('Ncet PG Application form email verification',sender='afreen04.taj.s@gmail.com',recipients=[email])
 
         # msg body,otp must b string so that it can b written in the body
         msg.body="Hi"+name+"\nYour email OTP is:" +str(otp)
@@ -399,7 +399,7 @@ def forgot_password():
             session['otp_timestamp'] = time.time()
 
             try:
-                msg = Message('Password Reset OTP', sender='ncet_aks1@outlook.com', recipients=[email])
+                msg = Message('Password Reset OTP', sender='afreen04.taj.s@gmail.com', recipients=[email])
                 msg.body = f"Your OTP for password reset is {otp}."
                 mail.send(msg)
                 flash('OTP has been sent to your email. Please check your inbox.', category='info')
@@ -433,7 +433,7 @@ def verify_application_number_otp():
                 session.pop('otp_timestamp',None)
 
                 try:
-                    msg=Message('Your Application Number', sender='ncet_aks1@outlook.com',recipients=[email])
+                    msg=Message('Your Application Number', sender='afreen04.taj.s@gmail.com',recipients=[email])
                     msg.body = f"Hi,\nYour application number is: {application_number}."
                     mail.send(msg)
                     flash('Your application number has been sent to your email.', category='success')
@@ -461,7 +461,7 @@ def forgot_application_number():
             session['otp_timestamp']=time.time()
 
             try:
-                msg=Message('Application Number Retrieval OTP',sender='ncet_aks1@outlook.com',recipients=[email])
+                msg=Message('Application Number Retrieval OTP',sender='afreen04.taj.s@gmail.com',recipients=[email])
                 msg.body=f"Your OTP for retrieving the application number is {otp}."
                 mail.send(msg)
                 flash('OTP sent to your email.Please check your inbox.',category='info')
