@@ -1,9 +1,132 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Welcome to NCET PG Application Portal{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/LandingPage.css') }}">
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+{% endblock %}
 
 {% block content %}
-    <h2>Welcome to Ncet PG Application form</h2>
-    <h3>Landing Page design</h3>
+    <!-- Header Section with Logo and Signin/Signup -->
+    <!-- Header Section with Logo and Signin/Signup -->
+    <header id="header" class="navbar">
+        <div id="logo">
+            <img src="{{ url_for('static', filename='css/Logo.jpg') }}" alt="Logo">
+        </div>
+        <div id="auth-buttons">
+            <a href="{{ url_for('auth.signup') }}" class="btn btn-outline-primary">Sign Up</a>
+            <a href="{{ url_for('auth.signin') }}" class="btn btn-outline-secondary">Sign In</a>
+        </div>
+    </header>
+
+
+    <!-- Hero Section with Text and Image -->
+    <div class="home">
+        <div class="wavy-bg">
+            <svg viewBox="0 0 1440 320">
+                <path fill="#007bff" d="M0,128L30,133.3C60,139,120,149,180,154.7C240,160,300,160,360,170.7C420,181,480,203,540,208C600,213,660,203,720,186.7C780,171,840,149,900,144C960,139,1020,149,1080,165.3C1140,181,1200,203,1260,202.7C1320,203,1380,181,1410,170.7L1440,160L1440,320L1410,320C1380,320,1320,320,1260,320C1200,320,1140,320,1080,320C1020,320,960,320,900,320C840,320,780,320,720,320C660,320,600,320,540,320C480,320,420,320,360,320C300,320,240,320,180,320C120,320,60,320,30,320L0,320Z"></path>
+            </svg>
+        </div>
     
+        <div class="home-content">
+            <h1 class="slideBottom">Welcome to NCET PG Application Portal</h1>
+            <p class="fade-in">Join our prestigious postgraduate programs and unlock a world of <br>opportunities. With cutting-edge facilities, world-class faculty, and <br>tailored industry-relevant courses.<br> <strong>NDC is the right place for your higher education journey.</strong></p>
+            <a href="#"><i class='bx bxl-instagram'></i></a>
+            <a href="#"><i class='bx bxl-whatsapp'></i></a>
+            <a href="#"><i class='bx bxl-linkedin'></i></a>
+            <div class="home-sci">
+                <a href="{{ url_for('app_form.page1') }}" class="btn btn-primary btn-lg mt-3">Start Application</a>
+            </div>
+        </div>
+    
+        <div class="irregular-image-container">
+            <img src="{{ url_for('static', filename='css/piic.jpg') }}" alt=" " class="irregular-image">
+        </div>
+    </div>
+    
+    
+
+    <!-- Features Section -->
+    <section id="features-section" class="py-5 text-center">
+        <div class="container">
+            <h2 class="mb-5">Why Choose NCET?</h2>
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="feature-box">
+                        <i class="fas fa-graduation-cap fa-3x mb-3"></i>
+                        <h3>World-Class Education</h3>
+                        <p>NCET offers highly recognized postgraduate programs with world-class faculty and cutting-edge facilities.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="feature-box">
+                        <i class="fas fa-laptop-code fa-3x mb-3"></i>
+                        <h3>Industry-Relevant Curriculum</h3>
+                        <p>Our curriculum is tailored to meet industry needs and provides practical skills for your future career.</p>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="feature-box">
+                        <i class="fas fa-briefcase fa-3x mb-3"></i>
+                        <h3>Placement Assistance</h3>
+                        <p>Receive comprehensive placement support and access to top recruiters across multiple industries.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Steps Section -->
+    <section id="steps-section" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5">How to Apply</h2>
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    <div class="step-box">
+                        <i class="fas fa-user-edit fa-3x mb-3"></i>
+                        <h4>Step 1: Register</h4>
+                        <p>Create an account and fill in your details to start your application.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="step-box">
+                        <i class="fas fa-file-alt fa-3x mb-3"></i>
+                        <h4>Step 2: Complete the Application</h4>
+                        <p>Submit your documents, academic history, and any relevant certificates.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="step-box">
+                        <i class="fas fa-paper-plane fa-3x mb-3"></i>
+                        <h4>Step 3: Submit & Proceed</h4>
+                        <p>Review and submit your application. We will get back to you with the next steps!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer CTA -->
+    <section id="cta-section" class="text-center text-white">
+        <div class="container">
+            <h2>Ready to Begin Your Journey?</h2>
+            <p class="lead">Start your application today and take the first step toward your future at NCET!</p>
+            <a href="{{ url_for('app_form.page1') }}" class="btn btn-lg btn-light mt-3">Apply Now</a>
+        </div>
+    </section>
+
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.fade-in');
+            elements.forEach((element) => {
+                element.classList.add('fade-in');
+            });
+        });
+    </script>
+
 {% endblock %}
